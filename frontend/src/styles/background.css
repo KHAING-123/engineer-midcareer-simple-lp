@@ -1,0 +1,216 @@
+/* ========================================
+   LP全体の背景：白ベース＋ごく淡いブルーの光
+   ・ページは基本的に白。セクションごとに色ブロックは作らない
+   ・各セクションの端から、淡いブルーの光（グロー）や細い曲線が少しだけ見える
+   ・光はすべてコンテンツの「後ろ」に描画（カード・画像の色は変わらない）
+   色の濃さは下の変数で一括調整できます
+   ======================================== */
+:root {
+  --page-bg: #FFFFFF;
+  --glow-blue: 214, 236, 255;   /* #D6ECFF：光の色 */
+  --glow-cyan: 226, 246, 250;   /* #E2F6FA：ごく薄い水色 */
+  --glow-strength: 0.32;        /* 光の濃さ（0.15〜0.35 目安） */
+  --curve-line: rgba(190, 220, 250, 0.32); /* 細い曲線の色 */
+
+  /* Header / Footer 共通：白 → ごく淡いブルー のグラデーション色（R, G, B） */
+  --surface-start: 255, 255, 255;  /* #FFFFFF */
+  --surface-mid: 250, 253, 255;    /* #FAFDFF */
+  --surface-end: 241, 248, 255;    /* #F1F8FF */
+}
+
+body {
+  /* 上部（Header〜Hero）の左上にだけ淡い光 */
+  background:
+    radial-gradient(1100px 640px at -5% -10%, rgba(var(--glow-blue), 0.4), transparent 62%),
+    radial-gradient(900px 520px at 105% 0%, rgba(var(--glow-cyan), 0.32), transparent 60%),
+    var(--page-bg);
+}
+
+/* main：光をコンテンツの後ろに閉じ込める（横スクロールも防ぐ） */
+main {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+
+/* ゆっくり横切る、ごく淡い光（約28秒） */
+main::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(90deg, rgba(var(--glow-blue), 0) 0%, rgba(var(--glow-blue), 0.22) 50%, rgba(var(--glow-blue), 0) 100%);
+  transform: translateX(-100%);
+  animation: lpBgSweep 28s ease-in-out infinite alternate;
+  will-change: transform;
+  pointer-events: none;
+}
+
+@keyframes lpBgSweep {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(320%); }
+}
+
+/* ---------- セクションの光（共通設定） ---------- */
+.section {
+  position: relative; /* 光の位置の基準（重なり順は main 基準のまま） */
+  --glow-size: clamp(420px, 46vw, 920px);
+  --curve-size: clamp(700px, 70vw, 1500px);
+}
+
+.section::before,
+.section::after {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* 光：大きくぼかした円 */
+.section::before {
+  width: var(--glow-size);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgba(var(--glow-color, var(--glow-blue)), var(--glow-strength)) 0%, rgba(var(--glow-color, var(--glow-blue)), 0) 68%);
+}
+
+/* 曲線：細い線の大きな円の一部 */
+.section::after {
+  width: var(--curve-size);
+  aspect-ratio: 1;
+  border: 1px solid var(--curve-line);
+}
+
+/* ---------- セクションごとの配置 ---------- */
+
+/* 01 MEMBERS：右側に光 */
+#members::before {
+  content: '';
+  top: 0;
+  right: calc(var(--glow-size) * -0.45);
+}
+
+/* 01 MEMBERS：左側に大きな淡い楕円（線ではなく面） */
+#members::after {
+  content: '';
+  top: 28%;
+  left: calc(var(--curve-size) * -0.45);
+  aspect-ratio: 1.6;
+  border: none;
+  background: radial-gradient(ellipse, rgba(var(--glow-blue), 0.22) 0%, rgba(var(--glow-blue), 0) 70%);
+}
+
+/* 02 OUR WORK：左下にごく薄い水色 */
+#work::before {
+  content: '';
+  --glow-color: var(--glow-cyan);
+  --glow-size: clamp(360px, 36vw, 720px);
+  bottom: -20%;
+  left: calc(var(--glow-size) * -0.5);
+}
+
+/* 03 GROWTH STEP：白→ごく淡いブルー（上下はふわっと消える）＋左側に光＋曲線 */
+#growth {
+  background: linear-gradient(180deg, rgba(245, 250, 255, 0) 0%, rgba(245, 250, 255, 0.6) 22%, rgba(245, 250, 255, 0.6) 78%, rgba(245, 250, 255, 0) 100%);
+}
+
+
+#growth::before {
+  content: '';
+  top: 10%;
+  left: calc(var(--glow-size) * -0.5);
+}
+
+#growth::after {
+  content: '';
+  top: -10%;
+  right: calc(100% - 18vw);
+}
+
+/* 04 SUPPORT：光なし（03・05の光が自然につながる） */
+
+/* 05 CAREER PATH：右側に光＋曲線 */
+#career::before {
+  content: '';
+  --glow-size: clamp(460px, 52vw, 1000px);
+  top: -10%;
+  right: calc(var(--glow-size) * -0.48);
+}
+
+#career::after {
+  content: '';
+  top: 0;
+  left: calc(100% - 16vw);
+}
+
+/* 06 INTERVIEW：ごく淡いブルーの帯（上下はふわっと消えるので境目は出ない）＋左下に光 */
+#interview {
+  background: linear-gradient(180deg, rgba(242, 249, 255, 0) 0%, rgba(242, 249, 255, 0.7) 25%, rgba(242, 249, 255, 0.7) 75%, rgba(242, 249, 255, 0) 100%);
+}
+
+#interview::before {
+  content: '';
+  --glow-size: clamp(400px, 40vw, 820px);
+  bottom: 0;
+  left: calc(var(--glow-size) * -0.5);
+}
+
+/* 07 FLOW：白ベース、右下にだけごく淡いブルー。波・曲線は FlowSection.vue 内 */
+#flow {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 55%, rgba(247, 251, 254, 0.9) 100%);
+}
+
+/* 07 FLOW → Final CTA：左下から光 */
+#flow::before {
+  content: '';
+  --glow-color: var(--glow-cyan);
+  bottom: -35%;
+  left: calc(var(--glow-size) * -0.45);
+}
+
+/* ---------- スマホ：光を小さく・画面の端へ ---------- */
+@media (max-width: 767px) {
+  #members::before,
+  #work::before,
+  #growth::before,
+  #career::before,
+  #flow::before {
+    --glow-size: 90vw;
+  }
+
+  .section {
+    --curve-size: 150vw;
+  }
+
+  #members::before,
+  #career::before {
+    right: -55vw;
+  }
+
+  #growth::before,
+  #work::before,
+  #flow::before {
+    left: -55vw;
+  }
+
+  #growth::after {
+    right: calc(100% - 10vw);
+  }
+
+  #members::after {
+    left: -100vw;
+  }
+
+  #career::after {
+    left: calc(100% - 10vw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main::before {
+    animation: none;
+    transform: translateX(60%);
+  }
+}

@@ -1,0 +1,143 @@
+/* ========================================
+   全体の共通スタイル
+   ======================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-height);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
+  font-variant-numeric: lining-nums;
+}
+
+h1, h2, h3, h4, p, ul, ol, figure {
+  margin: 0;
+  padding: 0;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/* 各セクションの中身の箱：画面幅いっぱい＋左右に余白（01〜07） */
+.container {
+  width: 100%;
+  max-width: none;
+  margin-inline: auto;
+  padding-inline: var(--layout-pc-padding);
+}
+
+.section {
+  width: 100%;
+  padding-block: calc(var(--section-space) / 2);
+}
+
+/* \n を改行として表示 */
+.pre-line {
+  white-space: pre-line;
+}
+
+/* 画像の共通ホバー（写真をほんの少し拡大） */
+.img-zoom {
+  overflow: hidden;
+}
+
+.img-zoom img {
+  transition: transform 0.8s var(--ease);
+}
+
+.img-zoom:hover img {
+  transform: scale(1.02);
+}
+
+/* カードの共通ホバー（少し浮く） */
+.card-lift {
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* スクロール表示アニメーション（v-reveal） */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .card-lift:hover,
+  .img-zoom:hover img {
+    transform: none;
+  }
+}

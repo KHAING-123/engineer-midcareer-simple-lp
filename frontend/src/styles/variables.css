@@ -1,0 +1,64 @@
+/* ========================================
+   デザインの基本設定（色・フォント・余白）
+   ここを変えるとページ全体に反映されます
+   ======================================== */
+:root {
+  /* Color */
+  --color-bg: #F7F6F2;
+  --color-bg-white: #FFFFFF;
+  --color-text: #202020;
+  --color-text-light: #6F6F6F;
+  --color-border: #DEDCD6;
+  --color-accent: #8B4035;
+  --color-note: #F6EFDC;
+
+  /* Font */
+  --font-sans: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  --font-serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  --font-en: 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-hand: 'Klee One', var(--font-serif);
+
+  /* Layout */
+  --gutter: 40px;
+
+  /* ----- LP全体の幅のルール（全セクション共通） -----
+     PCでは全セクションが画面の左端〜右端までを使う（Full Width）。
+     中身は左右に下の余白だけ空ける。Header / 01〜07 / Footer の左端・右端はすべてこの余白でそろう */
+  --layout-pc-padding: clamp(32px, 5vw, 96px);
+
+  /* 文章が横に長くなりすぎないための幅 */
+  --text-readable: 680px;
+
+  /* アイコン（最小 → 画面幅に比例 → 最大） */
+  --icon-sm: clamp(32px, 2.2vw, 50px);
+  --icon-md: clamp(36px, 2.5vw, 56px);
+  --icon-circle: clamp(48px, 3.3vw, 72px);
+
+  /* カード・画像同士のすき間 */
+  --grid-gap: clamp(20px, 2.5vw, 48px);
+  --header-height: 60px;
+  --section-space: clamp(120px, 8vw, 180px);
+
+  /* Decoration */
+  --radius: 4px;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 12px 36px rgba(0, 0, 0, 0.07);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --gutter: 32px;
+    --layout-pc-padding: 32px;
+    --section-space: 96px;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --gutter: 20px;
+    --layout-pc-padding: 20px;
+    --header-height: 56px;
+    --section-space: 72px;
+  }
+}
