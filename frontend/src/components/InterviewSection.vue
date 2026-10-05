@@ -21,8 +21,10 @@ defineProps({
 
       <!-- PC 右：大きな面接ビジュアル（飾り文字・メッセージ・淡い装飾つき） -->
       <div class="interview__visual">
+        <!-- 飾り文字「Interview ───」（文字と細い線を同じ箱に） -->
         <p v-if="content.scriptLabel" v-reveal class="interview__script" aria-hidden="true">
-          {{ content.scriptLabel }}
+          <span class="interview__script-text">{{ content.scriptLabel }}</span>
+          <span class="interview__script-line" />
         </p>
 
         <figure v-reveal class="interview__frame">
@@ -168,34 +170,63 @@ defineProps({
   box-shadow: 0 18px 50px rgba(40, 80, 110, 0.1);
 }
 
-/* 「Interview」飾り文字（見出しではない装飾） */
+/* 「Interview ───」飾り文字（見出しではない装飾）
+   細い斜体のセリフ体＋右に細い線。文字はゆっくり濃淡、線はゆっくり伸び縮み（5.5秒） */
 .interview__script {
   position: absolute;
   z-index: 2;
-  top: clamp(-96px, -5.6vw, -50px);
-  left: clamp(-64px, -3.4vw, -24px);
+  top: -0.74em; /* 文字の下端が画像の上端に少しかかる位置 */
+  left: clamp(-56px, -3vw, -20px);
+  display: flex;
+  align-items: center;
+  gap: 0.16em;
+  margin: 0;
   font-family: var(--font-en);
-  font-style: italic;
-  font-weight: 400;
-  font-size: clamp(56px, 7vw, 110px);
+  font-size: clamp(72px, 6.6vw, 130px);
   line-height: 1;
-  letter-spacing: 0.01em;
-  color: rgba(110, 190, 245, 0.68);
+  white-space: nowrap;
   pointer-events: none;
   transition-duration: 0.95s;
 }
 
-/* 飾り文字の下の、手書き風の細い線 */
-.interview__script::after {
-  content: '';
-  display: block;
-  width: 92%;
-  height: 14px;
-  margin-top: -6px;
-  margin-left: 6%;
-  border-bottom: 1.5px solid rgba(100, 185, 245, 0.55);
-  border-radius: 0 0 50% 40% / 0 0 100% 60%;
-  transform: rotate(-4deg);
+/* 細く強弱のあるセリフ体の斜体（Mac/iPhone は Bodoni 72・Didot、
+   それ以外の環境は読み込み済みの Cormorant Garamond 斜体で表示） */
+.interview__script-text {
+  font-family: "Bodoni 72", "Didot", "Cormorant Garamond", "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  font-synthesis: none; /* 太字・斜体を機械的に作らない（本物の斜体だけを使う） */
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: rgba(105, 150, 210, 0.72);
+  animation: interviewSoftPulse 5.5s ease-in-out infinite;
+}
+
+/* 文字の下寄り（xハイトの中ほど）にそろえる細い線 */
+.interview__script-line {
+  flex-shrink: 0;
+  width: clamp(80px, 8vw, 150px);
+  height: 1px;
+  margin-top: 0.22em;
+  background: rgba(90, 130, 185, 0.65);
+  transform-origin: left center;
+  animation: interviewLineMotion 5.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes interviewSoftPulse {
+  0%, 100% { opacity: 0.78; }
+  50% { opacity: 0.38; }
+}
+
+@keyframes interviewLineMotion {
+  0%, 100% {
+    transform: scaleX(0.72);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scaleX(1);
+    opacity: 0.75;
+  }
 }
 
 /* 飾り文字は左からふわっと表示 */
@@ -346,7 +377,6 @@ defineProps({
 /* ---------- 縦並び（1199px以下） ---------- */
 @media (max-width: 1199px) {
   .interview__script {
-    top: -48px;
     left: -12px;
   }
 
@@ -377,7 +407,11 @@ defineProps({
     position: static;
     order: -1;
     margin-bottom: 4px;
-    font-size: clamp(42px, 14vw, 64px);
+    font-size: clamp(48px, 15vw, 72px);
+  }
+
+  .interview__script-line {
+    width: clamp(40px, 14vw, 72px);
   }
 
   .interview__frame::before {
@@ -428,6 +462,12 @@ defineProps({
 @media (prefers-reduced-motion: reduce) {
   .interview__message-inner {
     animation: none;
+  }
+
+  .interview__script-text,
+  .interview__script-line {
+    animation: none !important;
+    transition: none !important;
   }
 }
 </style>

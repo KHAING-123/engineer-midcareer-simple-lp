@@ -181,7 +181,7 @@ const textLinks = computed(() => [props.content.links.terms, props.content.links
   display: inline-flex;
   align-items: center;
   gap: 14px;
-  margin-top: 16px;
+  margin-top: 30px;
   font-size: 14px;
   line-height: 1.7;
   letter-spacing: 0.04em;
@@ -274,7 +274,7 @@ a.footer__link:hover {
   border-radius: 999px;
   color: #17243D;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(240, 248, 255, 0.92) 50%, rgba(225, 240, 255, 0.82) 100%);
-  box-shadow: 0 8px 24px rgba(65, 110, 165, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgba(70, 130, 200, 0.12), 0 2px 8px rgba(40, 90, 150, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   overflow: hidden;
@@ -283,7 +283,7 @@ a.footer__link:hover {
   letter-spacing: 0.06em;
   line-height: 1.4;
   white-space: nowrap;
-  transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.35s ease, background 0.35s ease;
 }
 
 /* ホバー時に左上→右下へ通る、ごく淡い光 */
@@ -314,7 +314,7 @@ a.footer__button[href] {
 a.footer__button[href]:hover {
   transform: translateY(-2px);
   border-color: rgba(65, 115, 210, 0.55);
-  box-shadow: 0 12px 30px rgba(65, 110, 180, 0.16), 0 0 20px rgba(90, 145, 235, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 30px rgba(70, 130, 200, 0.17), 0 4px 10px rgba(40, 90, 150, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 a.footer__button[href]:hover::before {
@@ -408,8 +408,11 @@ a.footer__button[href]:hover .footer__button-icon {
 }
 
 /* 下段：コピーライト（左下） */
+/* フッター全体の横幅に対して中央（左右の余白は同じなので中央がずれない） */
 .footer__copyright {
-  margin-top: clamp(20px, 2vw, 32px);
+  width: 100%;
+  margin-top: clamp(28px, 2.6vw, 40px);
+  text-align: center;
   font-size: clamp(11px, 0.8vw, 13px);
   letter-spacing: 0.06em;
   color: var(--footer-ink-sub);
@@ -476,7 +479,7 @@ a.footer__button[href]:hover .footer__button-icon {
   .footer__address {
     align-items: flex-start;
     gap: 10px;
-    margin-top: 18px;
+    margin-top: 32px;
     font-size: 13.5px;
     line-height: 1.8;
   }
@@ -507,7 +510,7 @@ a.footer__button[href]:hover .footer__button-icon {
   }
 
   .footer__copyright {
-    margin-top: 20px;
+    margin-top: 28px;
   }
 }
 
@@ -521,6 +524,10 @@ a.footer__button[href]:hover .footer__button-icon {
 
   a.footer__button[href]:hover::before {
     animation: none;
+  }
+
+  .footer__button {
+    transition: none !important;
   }
 
   .company-link__text {

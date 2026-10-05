@@ -136,29 +136,23 @@ export const lpContent = {
     number: '01',
     englishTitle: 'MEMBERS',
     title: 'どんな人が\n働いている？',
-    description: 'PREAIには、新卒・既卒・未経験など\nさまざまな背景からエンジニアに挑戦した\n仲間がたくさんいます。',
+    description: 'PREAIには、さまざまな経験や強みを持ったメンバーが働いています。\nこれまで培ってきた経験を活かしながら、IT・AIという新しいスキルを身につけ、それぞれのキャリアに挑戦しています。\n共通しているのは、新しいことを学び、自分の可能性を広げようとする姿勢です。',
     // メンバー1人 = { … } 1つ
     items: [
       {
         image: member01,
         alt: 'AI開発に挑戦中のメンバー',
-        roleLabel: 'CAREER CONSULTANT', // 画像の横に縦書きで表示される役割（英語）
-        background: '前職：営業', // 写真内の小さいボックス 1行目
-        current: '今はAI開発に挑戦中' // 写真内の小さいボックス 2行目
+        roleLabel: 'CAREER CONSULTANT' // 画像の横に縦書きで表示される役割（英語）        
       },
       {
         image: member02,
         alt: '未経験からエンジニアになったメンバー',
-        roleLabel: 'ENGINEER',
-        background: '前職：事務',
-        current: '未経験からエンジニアへ'
+        roleLabel: 'ENGINEER'
       },
       {
         image: member03,
         alt: 'データ分析に挑戦中のメンバー',
-        roleLabel: 'ENGINEER',
-        background: '前職：販売',
-        current: 'データ分析に挑戦中'
+        roleLabel: 'ENGINEER'
       }
     ]
   },
@@ -171,7 +165,7 @@ export const lpContent = {
     number: '02',
     englishTitle: 'OUR WORK',
     title: 'PREAIでの仕事',
-    description: 'お客様の「こうしたい」をITのチカラでカタチにする仕事です。\nまずは得意分野を見つけるところから始めましょう。',
+    description: 'お客様の課題を整理し、AIやITを活用して解決へ導く仕事です。\nまずはPMOやAI導入支援から経験し、将来的には要件定義やプロジェクトマネジメントにも挑戦できます。',
     // 右側の小さな英文（装飾）
     sideNote: 'Create\nReal Value\nwith AI',
     // カード1枚 = { … } 1つ
@@ -179,23 +173,23 @@ export const lpContent = {
       {
         image: workWeb,
         alt: 'ノートPCでWebアプリを開発している様子',
-        title: 'Webアプリ開発',
-        description: '業務システムやWebサービスの画面・機能をつくります。チームで設計からリリースまで取り組みます。',
-        tags: ['HTML / CSS', 'JavaScript', 'Vue.js', 'PHP'] // 技術タグ
+        title: 'PM・PMO',
+        description: '大手企業のDX・ITプロジェクトに参画し、会議運営、進捗・課題管理、関係者との調整などを担当します。経験を積みながら、要件整理や顧客折衝、プロジェクト全体を動かすPM業務へとステップアップしていきます。',
+        tags: ['Excel', 'PowerPoint', 'Teams', 'Slack','生成AI'] // 技術タグ
       },
       {
         image: workMobile,
         alt: 'スマートフォンアプリを確認している様子',
-        title: 'モバイルアプリ開発',
-        description: 'iOS・Androidアプリを開発します。ユーザーが毎日使う身近なサービスに関われます。',
-        tags: ['Flutter', 'Swift', 'Kotlin', 'Firebase']
+        title: 'AI・DXツール導入支援',
+        description: '大手企業を中心に、生成AIや業務効率化ツールの導入・活用を支援します。お客様の業務や課題を整理し、ツールの選定・導入から、活用方法の検討、現場への定着までサポートします。',
+        tags: ['Microsoft Copilot', 'Power Platform（Power Apps等）', 'ChatGPT', 'Claude','Gemini','NotebookLM']
       },
       {
         image: workAi,
         alt: 'データ分析のダッシュボード画面',
-        title: 'データ分析・AI開発',
-        description: 'データを集めて分析し、AIモデルを活用した仕組みづくりに挑戦します。',
-        tags: ['Python', 'SQL', '機械学習', '生成AI']
+        title: '業務自動化',
+        description: 'n8nやAIを活用し、これまで人が手作業で行っていた業務を自動化します。業務フローを整理し、AIや各種サービスを組み合わせながら、実際に動く仕組みをつくります。',
+        tags: ['n8n', 'Claude Code', 'Codex', 'API連携']
       }
     ]
   },

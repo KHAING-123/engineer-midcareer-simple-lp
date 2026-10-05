@@ -149,24 +149,31 @@ onBeforeUnmount(() => {
   transform-origin: left;
 }
 
-/* まずは話を聞いてみる：クリックできない小さな見出し
-   ・ナビより少し太く・字間広め
-   ・下に細いブルーの線＋その上を淡い光がゆっくり流れる
-   ・ホバーの反応なし */
+/* まずは話を聞いてみる：テキスト型のCTA（ボタンにはしない）
+   ・下にごく薄い線（常時）＋その上を淡いブルーの線が左→右へゆっくり伸びて消える（5.2秒で繰り返し）
+   ・PCでマウスを乗せると、文字が2px上がり字間が少し広がり、線が少しはっきりする */
 .header__catch {
+  --catch-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
   position: relative;
   display: inline-block;
   padding: 8px 0 10px;
-  overflow: hidden;
-  color: #172033;
+  color: #14213A;
   font-size: clamp(14px, 1vw, 15px);
   font-weight: 600;
   letter-spacing: 0.12em;
   line-height: 1.4;
   white-space: nowrap;
   cursor: default;
+  transition:
+    transform 0.35s var(--catch-ease),
+    letter-spacing 0.35s ease,
+    margin 0.35s ease,
+    color 0.35s ease,
+    opacity 0.35s ease;
 }
 
+.header__catch::before,
 .header__catch::after {
   content: '';
   position: absolute;
@@ -174,37 +181,68 @@ onBeforeUnmount(() => {
   bottom: 3px;
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, rgba(80, 145, 205, 0.3), rgba(90, 170, 225, 0.75), rgba(80, 145, 205, 0.3));
+  pointer-events: none;
 }
 
+/* 常に見えている、ごく薄い下線 */
 .header__catch::before {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  left: 0;
-  bottom: 3px;
-  width: 30%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(100, 180, 235, 0.95), transparent);
-  transform: translateX(-120%);
-  animation: headerCatchLine 4s ease-in-out infinite;
+  background: rgba(110, 165, 215, 0.2);
+  transition: background-color 0.35s ease;
 }
 
-@keyframes headerCatchLine {
+/* 左→右へ伸びる淡いブルーの下線 */
+.header__catch::after {
+  background: linear-gradient(90deg, transparent, rgba(90, 160, 220, 0.55), rgba(130, 195, 235, 0.9), transparent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: headerCatchReveal 5.2s var(--catch-ease) infinite;
+  transition: height 0.35s ease;
+}
+
+@keyframes headerCatchReveal {
   0% {
-    transform: translateX(-120%);
+    transform: scaleX(0);
     opacity: 0;
   }
-  20% {
+  15% {
     opacity: 1;
   }
-  75% {
+  55% {
+    transform: scaleX(1);
     opacity: 1;
+  }
+  80% {
+    transform: scaleX(1);
+    opacity: 0.7;
   }
   100% {
-    transform: translateX(330%);
+    transform: scaleX(1);
     opacity: 0;
   }
+}
+
+/* PCのホバー：少し上へ・字間を少し広げる（広がった分は左の余白で吸収し、ナビの位置は動かさない） */
+@media (hover: hover) {
+  .header__catch:hover {
+    transform: translateY(-2px);
+    letter-spacing: 0.15em;
+    margin-left: -0.3em; /* 10文字 × 0.03em */
+    color: #0E1A31;
+  }
+
+  .header__catch:hover::before {
+    background-color: rgba(110, 165, 215, 0.42);
+  }
+
+  .header__catch:hover::after {
+    height: 1.5px;
+  }
+}
+
+/* リンクにした場合のキーボード操作用（現在はクリックできない文字のため通常は表示されない） */
+.header__catch:focus-visible {
+  outline: 1px solid rgba(80, 140, 200, 0.6);
+  outline-offset: 5px;
 }
 
 .header__toggle {
@@ -543,43 +581,32 @@ onBeforeUnmount(() => {
     color: #173153;
   }
 
-  /* 短いブルーの線（幅55%） */
+  /* 短い下線（幅55%）：ごく薄い線＋左→右へ伸びる線（PCと同じ動き） */
+  .header__catch::before,
   .header__catch::after {
     bottom: 0;
     width: 55%;
-    background: linear-gradient(90deg, rgba(80, 145, 205, 0.75), rgba(120, 190, 235, 0.4), rgba(120, 190, 235, 0));
-  }
-
-  /* 線の上を淡い光が左→右へ流れる */
-  .header__catch::before {
-    bottom: 0;
-    width: 22%;
-    background: linear-gradient(90deg, transparent, rgba(80, 160, 220, 0.9), transparent);
-    animation: mobileCatchSweep 3.6s ease-in-out infinite;
-  }
-
-  @keyframes mobileCatchSweep {
-    0% {
-      transform: translateX(-100%);
-      opacity: 0;
-    }
-    20% {
-      opacity: 1;
-    }
-    70% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateX(250%);
-      opacity: 0;
-    }
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .header__catch::before {
+  /* 下線は止めて、細い線として表示したまま */
+  .header__catch::after {
     animation: none !important;
-    opacity: 0;
+    transform: scaleX(1);
+    opacity: 1;
+  }
+
+  .header__catch,
+  .header__catch::before,
+  .header__catch::after {
+    transition: none !important;
+  }
+
+  .header__catch:hover {
+    transform: none !important;
+    letter-spacing: 0.12em !important;
+    margin-left: 0 !important;
   }
 
   .header__bubble,

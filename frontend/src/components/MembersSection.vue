@@ -93,9 +93,16 @@ defineProps({
     grid-area: title;
   }
 
+  /* 説明文だけ20px下へ（下側を同じだけマイナスにして、行の高さ＝タイトル位置は変えない） */
   .members__heading :deep(.heading__description) {
     grid-area: desc;
-    margin-top: 0;
+    margin-top: 20px;
+    margin-bottom: -20px;
+  }
+
+  /* 3人の画像グループ全体を24px下へ */
+  .members__inner .members__list {
+    margin-top: calc(clamp(50px, 6vw, 100px) + 24px);
   }
 }
 
