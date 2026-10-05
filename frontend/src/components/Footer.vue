@@ -463,54 +463,103 @@ a.footer__button[href]:hover .footer__button-icon {
   }
 
   .footer__inner {
-    padding-block: 40px 28px;
+    padding: 44px 24px 26px;
   }
 
+  /* 上から：ロゴ → 住所カード → 利用規約｜プライバシーポリシー → 会社サイトへ（すべて中央） */
   .footer__top {
     flex-direction: column;
-    align-items: flex-start;
-    row-gap: 20px;
+    align-items: stretch;
+    row-gap: 30px;
   }
 
+  .footer__brand {
+    align-items: center;
+    width: 100%;
+  }
+
+  /* ロゴは中央・控えめなサイズ */
   .footer__logo-image {
-    width: 120px;
+    width: 140px;
   }
 
+  /* 住所：白いカード（全体が Google マップへのリンク） */
   .footer__address {
-    align-items: flex-start;
-    gap: 10px;
-    margin-top: 32px;
-    font-size: 13.5px;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    margin-top: 30px;
+    padding: 18px 16px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(210, 225, 238, 0.5);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(70, 110, 150, 0.05);
+    font-size: clamp(12.5px, 3.5vw, 13.5px);
     line-height: 1.8;
   }
 
+  /* ピンの後ろの淡いブルーの丸 */
   .footer__pin {
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    padding: 15px;
+    border-radius: 50%;
+    background: rgba(220, 238, 250, 0.7);
+    color: #1F2A44;
+  }
+
+  .footer__address-text {
+    min-width: 0;
   }
 
   .footer__actions {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    align-items: center;
+    gap: 30px;
     width: 100%;
   }
 
   .footer__links {
-    flex-wrap: wrap;
-    row-gap: 8px;
+    justify-content: center;
   }
 
+  .footer__link {
+    font-size: 15px;
+  }
+
+  /* 会社サイトへ：中央の大きめピル型ボタン（アイコン左・文字中央・矢印右） */
   .footer__button {
-    min-width: 170px;
-    min-height: 48px;
-    padding: 11px 18px;
+    justify-content: space-between;
+    width: min(100%, 360px);
+    min-width: 0;
+    min-height: 56px;
+    padding: 12px 24px;
     margin-left: 0;
+    box-shadow: 0 6px 18px rgba(70, 130, 200, 0.1), 0 2px 6px rgba(40, 90, 150, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
+  .footer__button-label {
+    flex: 1;
+    text-align: center;
+  }
+
+  /* 縦ループの2つ目の文字も中央にそろえる */
+  .company-link__text--next {
+    right: 0;
+  }
+
+  /* タップ時のわずかな反応 */
+  a.footer__button[href]:active {
+    transform: scale(0.985);
+  }
+
+  /* 区切り線＋コピーライト（フッター全体の中央） */
   .footer__copyright {
-    margin-top: 28px;
+    margin-top: 50px;
+    padding-top: 26px;
+    border-top: 1px solid rgba(100, 145, 180, 0.22);
+    font-size: 12px;
   }
 }
 
