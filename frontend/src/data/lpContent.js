@@ -61,19 +61,7 @@ import iconBook from '@/assets/images/icons/book.svg'
 import iconCode from '@/assets/images/icons/code.svg'
 import iconTeam from '@/assets/images/icons/team.svg'
 import iconGrowth from '@/assets/images/icons/growth.svg'
-import iconMentor from '@/assets/images/icons/mentor.svg'
-import iconStudy from '@/assets/images/icons/study.svg'
-import iconConsult from '@/assets/images/icons/consult.svg'
-import iconCertificate from '@/assets/images/icons/certificate.svg'
-import iconDeveloper from '@/assets/images/icons/developer.svg'
-import iconDatabase from '@/assets/images/icons/database.svg'
-import iconAi from '@/assets/images/icons/ai.svg'
-import iconLeader from '@/assets/images/icons/leader.svg'
-import iconManager from '@/assets/images/icons/manager.svg'
 import iconPerson from '@/assets/images/icons/person.svg'
-import iconHistory from '@/assets/images/icons/history.svg'
-import iconIdea from '@/assets/images/icons/idea.svg'
-import iconQuestion from '@/assets/images/icons/question.svg'
 import iconDocument from '@/assets/images/icons/document.svg'
 import iconChat from '@/assets/images/icons/chat.svg'
 import iconContract from '@/assets/images/icons/contract.svg'
@@ -201,8 +189,8 @@ export const lpContent = {
   growth: {
     number: '03',
     englishTitle: 'GROWTH STEP',
-    title: '未経験でも安心の\n成長ステップ',
-    description: '基礎から実践まで、段階的にスキルを\n身につけられる環境があります。',
+    title: '実践から始める、\nPREAIならではの\n成長ステップ',
+    description: '知識を学ぶだけではなく、\nAI・自動化ツールを実際に作るところからスタート。\n実務経験とキャリア支援を通じて、自分の強みを伸ばしていきます。',
     image: growthMain,
     alt: 'ノートPCでプログラミングを学ぶ様子',
     // 写真の上に表示される手書き風メッセージ
@@ -212,29 +200,29 @@ export const lpContent = {
       {
         label: 'STEP 01',
         period: '入社〜1ヶ月',
-        title: '基礎学習',
-        description: 'ITの基礎知識、プログラミングの基本を研修で学びます。PCの使い方からでも大丈夫です。',
+        title: '実践型AI・IT研修',
+        description: 'IT・AIの基礎を学びながら、n8nを使った業務自動化に挑戦。\n実際に自分で自動化ツールを作り、AIを「知っている」だけではなく\n「仕事で使える」状態を目指します。',
         icon: iconBook
       },
       {
         label: 'STEP 02',
-        period: '2〜3ヶ月',
-        title: '実践課題',
-        description: '簡単なアプリを実際に作りながら、チーム開発の流れやGitの使い方を身につけます。',
+        period: '2ヶ月目〜',
+        title: 'OJT・プロジェクト参加',
+        description: '先輩と一緒に実際のプロジェクトへ参画。\nPMOやAI・DXツールの導入支援など、実務を経験しながら仕事の進め方や\n顧客とのコミュニケーションを身につけます。',
         icon: iconCode
       },
       {
         label: 'STEP 03',
-        period: '4ヶ月〜',
-        title: 'OJT・プロジェクト参加',
-        description: '先輩と一緒に実際のプロジェクトへ参加。わからないことはすぐに相談できる環境です。',
+        // period: '4ヶ月〜',
+        title: '定期的なキャリア1on1',
+        description: '専属キャリアコンサルとの1on1を実施。\n現在の経験や強み、目指したいキャリアを整理し、\n次に身につけるスキルや挑戦する仕事を一緒に考えます。',
         icon: iconTeam
       },
       {
         label: 'STEP 04',
-        period: '1年目以降',
+        // period: '1年目以降',
         title: '継続的なスキルアップ',
-        description: '新しい技術の勉強会や資格取得を通じて、得意分野をどんどん伸ばしていきます。',
+        description: 'AI・ITの学習を継続しながら、要件定義やプロジェクトマネジメント、\nAI活用・業務自動化など、目指すキャリアに必要な専門性を伸ばしていきます。',
         icon: iconGrowth
       }
     ]
@@ -247,29 +235,30 @@ export const lpContent = {
   support: {
     number: '04',
     englishTitle: 'SUPPORT',
-    title: 'キャリアサポート',
-    description: 'ひとりで悩まない。成長を支える仕組みがあります。',
+    title: 'AI時代の成長環境',
+    description: 'PREAIでは、AIを研修だけで終わらせません。\n日々の業務から実際のプロジェクトまで、AIを使い、つくり、活かす環境を整えています。',
     sideNote: 'Support\nyour career',
+    // iconType：'tools' / 'daily' / 'build' / 'dx' から選べます（カード右上の番号は 01〜 自動）
     items: [
       {
-        title: 'メンター制度',
-        description: '年の近い先輩がメンターとしてつき、仕事の進め方から日々の悩みまで相談にのります。',
-        icon: iconMentor
+        title: 'AIツール費用を会社負担',
+        description: '必要なAIツールを、会社負担で利用できます。ChatGPTやClaude、Codexなど、\n業務や本人のスキルに合わせて必要なAIツール・プランを会社が負担。新しいツールも積極的に取り入れています。',
+        iconType: 'tools' // 線画イラストの種類（SupportIcon.vue）
       },
       {
-        title: '研修・学習環境',
-        description: 'オンライン教材や書籍購入を会社がサポート。業務時間内の学習時間も確保しています。',
-        icon: iconStudy
+        title: 'AIを日常業務で活用',
+        description: 'AIは、特別なものではなく日々の仕事の一部です。情報収集や資料作成、アイデア整理、議事録、分析など、さまざまな業務でAIを活用。実務を通じて、AIを使いこなす力を身につけます。',
+        iconType: 'daily' // 線画イラストの種類（SupportIcon.vue）
       },
       {
-        title: 'キャリア相談',
-        description: '定期的な1on1面談で、目指したい方向や次のステップを一緒に考えます。',
-        icon: iconConsult
+        title: 'AIで実際につくる',
+        description: '使うだけでなく、AIを活用して仕組みをつくります。n8nやClaude Code、Codexなどを活用し、業務自動化やツール開発に挑戦。自分で考え、実際に動くものをつくる経験を積めます。',
+        iconType: 'build' // 線画イラストの種類（SupportIcon.vue）
       },
       {
-        title: '資格取得支援',
-        description: '基本情報技術者試験などの受験費用を会社が負担。合格時にはお祝い金もあります。',
-        icon: iconCertificate
+        title: 'AI・DX案件を経験',
+        description: '学んだスキルを、実際のプロジェクトで活かします。大手企業を中心としたAI・DXプロジェクトに参画。Microsoft CopilotやPower Platformなどの導入・活用支援を通じて、AIをビジネスの現場で活かす経験を積みます。',
+        iconType: 'dx' // 線画イラストの種類（SupportIcon.vue）
       }
     ]
   },
@@ -284,31 +273,32 @@ export const lpContent = {
     title: 'キャリアの広がり',
     description: '経験を積んだ先には、さまざまなキャリアの選択肢があります。',
     sideNote: 'More career\npossibilities',
+    // iconType：'pm' / 'consultant' / 'dx' / 'automation' / 'ai-consultant' から選べます
     items: [
       {
-        title: '開発エンジニア',
-        description: 'Web・モバイルの設計から\n実装まで幅広く担当',
-        icon: iconDeveloper
+        title: 'PM・プロジェクトマネージャー',
+        description: '顧客やチームと連携\nしながら、プロジェクト\n全体を推進する。',
+        iconType: 'pm' // 線画アイコンの種類（CareerIcon.vue）
       },
       {
-        title: 'データエンジニア',
-        description: 'データ基盤を整え、\n活用できる形に整備',
-        icon: iconDatabase
+        title: 'ITコンサルタント',
+        description: 'お客様の課題を整理し、\nITを活用した解決策を \n企画・提案する。',
+        iconType: 'consultant' // 線画アイコンの種類（CareerIcon.vue）
       },
       {
-        title: 'AIエンジニア',
-        description: '機械学習・生成AIを使った\n仕組みを開発',
-        icon: iconAi
+        title: 'AI・DXプロジェクトリーダー',
+        description: 'AI・DX導入プロジェクトの\n中心となり、顧客・エンジニアを巻き込みながら導入を推進する。',
+        iconType: 'dx' // 線画アイコンの種類（CareerIcon.vue）
       },
       {
-        title: 'プロジェクトリーダー',
-        description: 'チームをまとめ、\n開発をリード',
-        icon: iconLeader
+        title: 'AI・自動化エンジニア',
+        description: 'n8nやClaude Codeなどを活用し、\nAIを組み込んだ業務自動化や仕組みをつくる。',
+        iconType: 'automation' // 線画アイコンの種類（CareerIcon.vue）
       },
       {
-        title: 'PM・上流工程',
-        description: 'お客様と要件を決め、\nプロジェクトを成功へ導く',
-        icon: iconManager
+        title: 'AIコンサルタント',
+        description: '業務課題を分析し、\n生成AIやAIツールを活用した業務改善を提案する。',
+        iconType: 'ai-consultant' // 線画アイコンの種類（CareerIcon.vue）
       }
     ]
   },
@@ -321,7 +311,7 @@ export const lpContent = {
     number: '06',
     englishTitle: 'INTERVIEW',
     title: '面接について',
-    description: '面接は「見極める場」ではなく「お互いを知る場」です。\n緊張せず、ありのままのあなたを教えてください。',
+    description: '面接は応募を強く促すCTAではなく、\n『まずは面接で、仕事内容や会社について詳しく話を聞いてみてください』\nというクローズドLP向けのトーンにする。',
     image: interviewMain,
     alt: '面接を担当する代表取締役のイラスト',
     // 画像左上の大きな飾り文字
@@ -329,26 +319,27 @@ export const lpContent = {
     // 画像右下に重なる小さなメッセージ（\n で改行）
     message: 'あなたの\nこれからの可能性を\n一緒に考えたい',
     topicsTitle: '面接でお話しすること',
+    // iconType：'person' / 'briefcase' / 'growth' / 'chat' から選べます
     topics: [
       {
         title: 'あなた自身について',
-        description: '得意なことや大切にしていることを教えてください。',
-        icon: iconPerson
+        description: '社会人経験者向けに\n『これまでの経験・強み』\nについて話す内容へ。',
+        iconType: 'person' // アイコンの種類（InterviewTopicIcon.vue）
       },
       {
         title: 'これまでの経験について',
-        description: '前職や学生時代に取り組んだことを、ありのままお聞かせください。',
-        icon: iconHistory
+        description: '『これまでどんな仕事・\n役割を経験してきたか』など、\n社会人経験を確認する内容へ。',
+        iconType: 'briefcase' // アイコンの種類（InterviewTopicIcon.vue）
       },
       {
         title: '仕事への向き合い方について',
-        description: '仕事をするうえで大切にしたいことを教えてください。',
-        icon: iconIdea
+        description: '『今後どんなキャリアを\n築きたいか／IT・AI領域で\n何をやってみたいか』を話す\n内容へ。',
+        iconType: 'growth' // アイコンの種類（InterviewTopicIcon.vue）
       },
       {
         title: '気になること・聞いてみたいこと',
-        description: '仕事内容や働き方など、何でも質問してください。',
-        icon: iconQuestion
+        description: '仕事内容・働き方・案件・\nキャリアなど、応募者側から\n自由に質問できる内容は残す。',
+        iconType: 'chat' // アイコンの種類（InterviewTopicIcon.vue）
       }
     ]
   },
@@ -365,10 +356,10 @@ export const lpContent = {
     description: 'シンプルでスピーディーに、できるだけ早く結果をご連絡します。',
     note: '最短1週間で\nご連絡！', // 右側の小さなメモ
     items: [
-      { number: '01', title: '書類選考', period: '（1〜2日）', icon: iconDocument },
+      { number: '01', title: '書類選考', period: '（1日）', icon: iconDocument },
       { number: '02', title: 'カジュアル面談', period: '（オンライン/1回）', icon: iconChat },
       { number: '03', title: '面接', period: '（1回）', icon: iconPerson },
-      { number: '04', title: '条件確認', period: '（1〜2日）', icon: iconContract },
+      { number: '04', title: '条件確認', period: '（1日）', icon: iconContract },
       { number: '05', title: '内定', period: '', icon: iconFlag, highlight: true }
     ]
   },

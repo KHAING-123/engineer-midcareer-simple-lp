@@ -1,5 +1,6 @@
 <script setup>
 import SectionHeading from './SectionHeading.vue'
+import InterviewTopicIcon from './InterviewTopicIcon.vue'
 
 defineProps({
   content: { type: Object, required: true }
@@ -45,15 +46,23 @@ defineProps({
       <!-- PC 左下：面接でお話しすること（2×2） -->
       <div v-reveal class="interview__panel">
         <h3 class="interview__panel-title">{{ content.topicsTitle }}</h3>
+        <!-- タイトル下：薄い線＋左から伸びる青い線（表示時に1回） -->
+        <span class="interview__panel-line" aria-hidden="true"><span class="interview__panel-accent" /></span>
         <ul class="interview__topics">
-          <li v-for="topic in content.topics" :key="topic.title" class="interview__topic">
-            <span class="interview__icon-wrap">
-              <img :src="topic.icon" alt="" class="interview__icon" width="32" height="32">
-            </span>
-            <div>
+          <li
+            v-for="(topic, index) in content.topics"
+            :key="topic.title"
+            v-reveal
+            class="interview__topic"
+            :style="{ '--reveal-delay': `${0.2 + index * 0.1}s` }"
+          >
+            <!-- 上：アイコン＋タイトル（横一列） -->
+            <div class="interview__topic-header">
+              <InterviewTopicIcon :type="topic.iconType" :index="index" class="interview__icon" />
               <h4 class="interview__topic-title">{{ topic.title }}</h4>
-              <p class="interview__topic-description">{{ topic.description }}</p>
             </div>
+            <!-- 下：説明文（カードの幅いっぱい） -->
+            <p class="interview__topic-description">{{ topic.description }}</p>
           </li>
         </ul>
       </div>
@@ -62,6 +71,11 @@ defineProps({
 </template>
 
 <style scoped>
+/* 画像を主役に見せるため、前後より少し広めの上下余白 */
+.interview {
+  padding-block: calc(var(--section-pad) * 1.15);
+}
+
 /* SP・タブレット：見出し → ビジュアル → お話しすること の縦並び
    PC（1200px〜）：左＝見出し＋お話しすること ／ 右＝ビジュアル の2カラム（下の @media）
    ※1024〜1199px は2カラムだと窮屈なため縦並び */
@@ -98,6 +112,22 @@ defineProps({
     align-self: end;
     width: 100%;
     margin-top: clamp(32px, 3vw, 48px);
+    padding-inline: clamp(24px, 2.2vw, 40px); /* 項目カードを横に広く使うため左右の余白を少し詰める */
+  }
+
+  /* PC：項目カードを少し横長に（左の列をわずかに広く） */
+  .interview__inner {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+  }
+
+  .interview__inner .interview__topics {
+    column-gap: clamp(24px, 1.8vw, 32px);
+    row-gap: clamp(24px, 1.6vw, 28px);
+  }
+
+  /* PC：アイコン（白い円＋弧）を約12%小さく */
+  .interview__inner .interview__icon {
+    --ti-size: clamp(50px, 3.7vw, 72px);
   }
 }
 
@@ -189,14 +219,12 @@ defineProps({
   transition-duration: 0.95s;
 }
 
-/* 細く強弱のあるセリフ体の斜体（Mac/iPhone は Bodoni 72・Didot、
-   それ以外の環境は読み込み済みの Cormorant Garamond 斜体で表示） */
+/* シンプルで落ち着いたサンセリフ（細め・直立） */
 .interview__script-text {
-  font-family: "Bodoni 72", "Didot", "Cormorant Garamond", "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 400;
-  font-synthesis: none; /* 太字・斜体を機械的に作らない（本物の斜体だけを使う） */
-  letter-spacing: -0.01em;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-weight: 300;
+  letter-spacing: 0.02em;
   line-height: 1;
   color: rgba(105, 150, 210, 0.72);
   animation: interviewSoftPulse 5.5s ease-in-out infinite;
@@ -277,87 +305,98 @@ defineProps({
   50% { transform: translateY(-4px); }
 }
 
-/* ---------- 面接でお話しすること（ビジュアルの下・控えめ） ---------- */
+/* ---------- 面接でお話しすること：大きな白いパネル ---------- */
 .interview__panel {
   width: min(100%, 1040px);
   margin-top: 72px;
-  padding: clamp(28px, 2.4vw, 40px) clamp(24px, 2.4vw, 40px) clamp(28px, 2.4vw, 40px);
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(205, 220, 232, 0.42);
-  border-radius: 12px;
-  box-shadow: 0 12px 40px rgba(50, 80, 110, 0.06);
+  padding: clamp(32px, 3vw, 52px) clamp(26px, 3vw, 52px) clamp(30px, 3vw, 48px);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(40, 65, 95, 0.08);
+  border-radius: clamp(24px, 2.2vw, 32px);
+  box-shadow: 0 18px 50px rgba(25, 45, 70, 0.04);
 }
 
-/* 見出し：下に薄い線＋左端に短いライトブルーの線 */
 .interview__panel-title {
-  position: relative;
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(205, 220, 232, 0.7);
   font-family: var(--font-serif);
-  font-size: 17px;
+  font-size: clamp(20px, 1.7vw, 26px);
   font-weight: 500;
   letter-spacing: 0.08em;
+  line-height: 1.5;
+  color: #17243A;
 }
 
-.interview__panel-title::after {
-  content: '';
+/* タイトル下の薄い線 */
+.interview__panel-line {
+  position: relative;
+  display: block;
+  height: 1px;
+  margin-top: clamp(16px, 1.6vw, 24px);
+  background: #D8E3ED;
+}
+
+/* 左から右へ伸びる青い線（スクロールで表示されたとき1回） */
+.interview__panel-accent {
   position: absolute;
   left: 0;
-  bottom: -1px;
-  width: 64px;
+  top: -0.5px;
+  width: clamp(120px, 10vw, 150px);
   height: 2px;
-  background: linear-gradient(90deg, #6EBDF2, #9EDCFF);
+  overflow: hidden;
+  background: linear-gradient(90deg, #58A9E8, #8CC6F2);
+  transform-origin: left center;
+  transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+
+.interview__panel.reveal:not(.is-visible) .interview__panel-accent {
+  transform: scaleX(0);
+}
+
+/* 描き終わったあと、線の上をごく淡い光がゆっくり流れる */
+.interview__panel-accent::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+  transform: translateX(-120%);
+  animation: interviewAccentSweep 6s ease-in-out 1.8s infinite;
+}
+
+@keyframes interviewAccentSweep {
+  0%, 55% { transform: translateX(-120%); }
+  100% { transform: translateX(320%); }
 }
 
 .interview__topics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 1.4vw, 20px);
+  margin-top: clamp(20px, 2vw, 30px);
 }
 
+/* 各項目：白 → ごく淡いブルー → 淡いブルーグレーのやわらかいカード（4枚とも同じ色） */
 .interview__topic {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
-  padding: 24px 12px 24px 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(20px, 2vw, 30px) clamp(20px, 2vw, 30px) clamp(22px, 2.2vw, 32px);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 252, 254, 0.94) 35%, rgba(242, 248, 252, 0.88) 68%, rgba(232, 243, 250, 0.78) 100%);
+  border: 1px solid rgba(40, 65, 90, 0.03);
+  border-radius: 24px;
+  box-shadow: 0 14px 36px rgba(28, 55, 82, 0.025);
 }
 
-/* 2×2の区切り線 */
-.interview__topic:nth-child(even) {
-  padding-left: 20px;
-  padding-right: 0;
-  border-left: 1px solid var(--color-border);
+/* アイコン＋タイトルを横一列（タイトルはアイコンの縦中央） */
+.interview__topic-header {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 1.4vw, 24px);
 }
 
-.interview__topic:nth-child(n + 3) {
-  border-top: 1px solid var(--color-border);
-}
-
-.interview__topic:nth-last-child(-n + 2) {
-  padding-bottom: 0;
-}
-
-/* アイコンの後ろの淡い丸（項目ごとに色を変える） */
-.interview__icon-wrap {
-  display: grid;
-  place-items: center;
-  width: calc(var(--icon-sm) + 20px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: rgba(214, 236, 255, 0.6);
-}
-
-.interview__topic:nth-child(2) .interview__icon-wrap { background: rgba(214, 240, 222, 0.6); }
-.interview__topic:nth-child(3) .interview__icon-wrap { background: rgba(255, 236, 204, 0.6); }
-.interview__topic:nth-child(4) .interview__icon-wrap { background: rgba(255, 222, 228, 0.6); }
-
+/* アイコン（白い円＋青い弧）のサイズ */
 .interview__icon {
-  width: calc(var(--icon-sm) * 0.8);
-  height: calc(var(--icon-sm) * 0.8);
-}
-
-.interview__topic-title {
-  margin-top: 2px;
+  --ti-size: clamp(56px, 4.2vw, 88px);
+  flex-shrink: 0;
+  margin-left: 6px;
 }
 
 .interview__topic-title {
@@ -367,8 +406,10 @@ defineProps({
   line-height: 1.6;
 }
 
+/* 説明文：アイコンの下から、カードの幅いっぱいを使う */
 .interview__topic-description {
-  margin-top: 6px;
+  width: 100%;
+  margin: clamp(16px, 1.6vw, 22px) 0 0;
   font-size: 11.5px;
   color: var(--color-text-light);
   line-height: 1.85;
@@ -432,26 +473,24 @@ defineProps({
 
   .interview__panel {
     margin-top: 48px;
-    padding: 24px 20px 28px;
+    padding: 30px 22px 30px;
   }
 
   .interview__topics {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
   }
 
-  .interview__topic,
-  .interview__topic:nth-child(even),
-  .interview__topic:nth-last-child(-n + 2) {
-    padding: 20px 0;
-    border-left: 0;
+  .interview__topic {
+    padding: 20px 20px 22px;
   }
 
-  .interview__topic + .interview__topic {
-    border-top: 1px solid var(--color-border);
+  .interview__topic-header {
+    gap: 18px;
   }
 
-  .interview__topic:last-child {
-    padding-bottom: 0;
+  .interview__icon {
+    --ti-size: 60px;
   }
 
   .interview__topic-description {
@@ -464,6 +503,8 @@ defineProps({
     animation: none;
   }
 
+  .interview__panel-accent,
+  .interview__panel-accent::after,
   .interview__script-text,
   .interview__script-line {
     animation: none !important;

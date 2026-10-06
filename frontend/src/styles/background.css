@@ -1,6 +1,7 @@
 /* ========================================
    LP全体の背景：白ベース＋ごく淡いブルーの光
-   ・ページは基本的に白。セクションごとに色ブロックは作らない
+   ・各セクションは白／ごく薄いグレー／ごく薄いブルーグレーの背景を交互に使う（差はごく控えめ）
+   ・セクションの境目は SectionDivider の細い線で補助する
    ・各セクションの端から、淡いブルーの光（グロー）や細い曲線が少しだけ見える
    ・光はすべてコンテンツの「後ろ」に描画（カード・画像の色は変わらない）
    色の濃さは下の変数で一括調整できます
@@ -55,8 +56,12 @@ main::before {
 }
 
 /* ---------- セクションの光（共通設定） ---------- */
+/* セクションごとの背景色（White → Light Gray → White → Blue Gray → White → White → Gray→White）
+   isolation：各セクション内の装飾（光・図形）を、そのセクションの背景の上・中身の下に描くため */
 .section {
-  position: relative; /* 光の位置の基準（重なり順は main 基準のまま） */
+  position: relative;
+  isolation: isolate;
+  background: var(--bg-white);
   --glow-size: clamp(420px, 46vw, 920px);
   --curve-size: clamp(700px, 70vw, 1500px);
 }
@@ -102,6 +107,11 @@ main::before {
   background: radial-gradient(ellipse, rgba(var(--glow-blue), 0.22) 0%, rgba(var(--glow-blue), 0) 70%);
 }
 
+/* 02 OUR WORK：ごく薄いグレー（白いカードが少し浮いて見える） */
+#work {
+  background: var(--bg-soft-gray);
+}
+
 /* 02 OUR WORK：左下にごく薄い水色 */
 #work::before {
   content: '';
@@ -111,10 +121,7 @@ main::before {
   left: calc(var(--glow-size) * -0.5);
 }
 
-/* 03 GROWTH STEP：白→ごく淡いブルー（上下はふわっと消える）＋左側に光＋曲線 */
-#growth {
-  background: linear-gradient(180deg, rgba(245, 250, 255, 0) 0%, rgba(245, 250, 255, 0.6) 22%, rgba(245, 250, 255, 0.6) 78%, rgba(245, 250, 255, 0) 100%);
-}
+/* 03 GROWTH STEP：白（左側に光＋曲線） */
 
 
 #growth::before {
@@ -129,7 +136,10 @@ main::before {
   right: calc(100% - 18vw);
 }
 
-/* 04 SUPPORT：光なし（03・05の光が自然につながる） */
+/* 04 AI時代の成長環境：ごく薄いブルーグレー（下端は白へ） */
+#support {
+  background: linear-gradient(180deg, #F8FBFD 0%, var(--bg-blue-gray) 55%, var(--bg-white) 100%);
+}
 
 /* 05 CAREER PATH：右側に光＋曲線 */
 #career::before {
@@ -145,10 +155,7 @@ main::before {
   left: calc(100% - 16vw);
 }
 
-/* 06 INTERVIEW：ごく淡いブルーの帯（上下はふわっと消えるので境目は出ない）＋左下に光 */
-#interview {
-  background: linear-gradient(180deg, rgba(242, 249, 255, 0) 0%, rgba(242, 249, 255, 0.7) 25%, rgba(242, 249, 255, 0.7) 75%, rgba(242, 249, 255, 0) 100%);
-}
+/* 06 INTERVIEW：白（画像が主役）＋左下に光 */
 
 #interview::before {
   content: '';
@@ -157,9 +164,9 @@ main::before {
   left: calc(var(--glow-size) * -0.5);
 }
 
-/* 07 FLOW：白ベース、右下にだけごく淡いブルー。波・曲線は FlowSection.vue 内 */
+/* 07 FLOW：ごく薄いグレー → 白。波・曲線は FlowSection.vue 内 */
 #flow {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 55%, rgba(247, 251, 254, 0.9) 100%);
+  background: linear-gradient(180deg, var(--bg-soft-gray) 0%, var(--bg-white) 100%);
 }
 
 /* 07 FLOW → Final CTA：左下から光 */

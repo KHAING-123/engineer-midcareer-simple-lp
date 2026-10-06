@@ -48,7 +48,7 @@ defineProps({
 
 <style scoped>
 .members {
-  padding-top: calc(var(--section-space) * 0.6);
+  padding-block: calc(var(--section-pad) * 1.1); /* 人物画像が主役になるよう少し広め */
 }
 
 /* 上：見出し ／ 下：3人のビジュアル */
@@ -63,16 +63,6 @@ defineProps({
   padding-top: 8px;
 }
 
-/* 「01」の下から伸びる細い縦線 */
-.members__heading::before {
-  content: '';
-  position: absolute;
-  left: 21px;
-  top: 72px;
-  bottom: 6px;
-  width: 1px;
-  background: rgba(70, 110, 140, 0.35);
-}
 
 @media (min-width: 1024px) {
   .members__heading :deep(.heading__body) {
@@ -89,8 +79,10 @@ defineProps({
     grid-area: label;
   }
 
+  /* タイトルは英字ラベルのすぐ下（他のセクションと同じ間隔） */
   .members__heading :deep(.heading__title) {
     grid-area: title;
+    align-self: start;
   }
 
   /* 説明文だけ20px下へ（下側を同じだけマイナスにして、行の高さ＝タイトル位置は変えない） */
@@ -269,10 +261,6 @@ defineProps({
 
 /* ---------- SP：縦1列、役割は横書き ---------- */
 @media (max-width: 767px) {
-  .members__heading::before {
-    left: 17px;
-    top: 58px;
-  }
 
   .members__list {
     grid-template-columns: minmax(0, 1fr);

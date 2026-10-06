@@ -39,6 +39,13 @@
   --header-height: 60px;
   --section-space: clamp(120px, 8vw, 180px);
 
+  /* セクションの背景・境界・上下余白（LP全体のリズム） */
+  --bg-white: #FFFFFF;
+  --bg-soft-gray: #F8FAFC;
+  --bg-blue-gray: #F7FAFC;
+  --border-soft: #E8EDF2;
+  --section-pad: clamp(96px, 8vw, 150px); /* 各セクションの上下の余白 */
+
   /* Decoration */
   --radius: 4px;
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
@@ -51,6 +58,7 @@
     --gutter: 32px;
     --layout-pc-padding: 32px;
     --section-space: 96px;
+    --section-pad: 88px;
   }
 }
 
@@ -60,5 +68,6 @@
     --layout-pc-padding: 20px;
     --header-height: 56px;
     --section-space: 72px;
+    --section-pad: 72px;
   }
 }
