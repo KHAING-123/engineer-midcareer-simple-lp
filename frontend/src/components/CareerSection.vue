@@ -1,4 +1,5 @@
 <script setup>
+import AiNetworkBackground from './common/AiNetworkBackground.vue'
 import SectionHeading from './SectionHeading.vue'
 import CareerIcon from './CareerIcon.vue'
 
@@ -9,6 +10,8 @@ defineProps({
 
 <template>
   <section id="career" class="section career">
+    <!-- 背景：ごく淡いAIネットワーク（コンテンツの後ろ） -->
+    <AiNetworkBackground variant="career" />
     <div class="container">
       <SectionHeading
         v-reveal
@@ -64,7 +67,7 @@ defineProps({
   padding: clamp(26px, 2.2vw, 34px) clamp(20px, 1.8vw, 30px) clamp(28px, 2.4vw, 36px);
   background: #FFFFFF;
   border: 1px solid #E1E7ED;
-  border-radius: 10px;
+  border-radius: 3px;
   box-shadow: 0 12px 32px rgba(20, 38, 60, 0.045);
   text-align: left;
   transition: transform 0.6s ease, box-shadow 0.6s ease;

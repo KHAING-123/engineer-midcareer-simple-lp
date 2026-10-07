@@ -1,4 +1,5 @@
 <script setup>
+import AiNetworkBackground from './common/AiNetworkBackground.vue'
 import SectionHeading from './SectionHeading.vue'
 import SupportIcon from './SupportIcon.vue'
 
@@ -9,6 +10,8 @@ defineProps({
 
 <template>
   <section id="support" class="section support">
+    <!-- 背景：ごく淡いAIネットワーク（コンテンツの後ろ） -->
+    <AiNetworkBackground variant="support" />
     <div class="container">
       <SectionHeading
         v-reveal

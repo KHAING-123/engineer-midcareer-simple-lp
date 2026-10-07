@@ -26,10 +26,6 @@ defineProps({
 </template>
 
 <style scoped>
-.final-cta {
-  margin-top: calc(var(--section-space) / 2);
-}
-
 .final-cta__inner {
   display: block;
 }

@@ -1,4 +1,5 @@
 <script setup>
+import AiNetworkBackground from './common/AiNetworkBackground.vue'
 import SectionHeading from './SectionHeading.vue'
 
 defineProps({
@@ -8,6 +9,8 @@ defineProps({
 
 <template>
   <section id="members" class="section members">
+    <!-- 背景：ごく淡いAIネットワーク（コンテンツの後ろ） -->
+    <AiNetworkBackground variant="members" />
     <div class="container members__inner">
       <SectionHeading
         v-reveal
@@ -208,7 +211,7 @@ defineProps({
   height: auto;
   object-fit: contain;
   object-position: center;
-  border-radius: clamp(4px, 0.5vw, 8px);
+  border-radius: 3px;
   box-shadow: 0 14px 40px rgba(30, 50, 70, 0.07);
   transition: box-shadow 0.5s ease;
 }

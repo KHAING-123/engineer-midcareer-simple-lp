@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import AiNetworkBackground from './common/AiNetworkBackground.vue'
 
 defineProps({
   content: { type: Object, required: true }
@@ -35,9 +36,9 @@ onBeforeUnmount(() => {
       </a>
 
       <nav id="global-nav" class="header__nav">
-        <!-- SPメニュー専用の背景装飾（淡い図形＋ゆっくり漂う泡）。PC・タブレットでは非表示 -->
+        <!-- SPメニュー専用の背景装飾：LP 01〜07 と同じ「星座 / AI Network」（右上・左端・下部の余白）。PC・タブレットでは非表示 -->
         <span class="header__menu-decor" aria-hidden="true">
-          <span v-for="n in 6" :key="n" class="header__bubble" />
+          <AiNetworkBackground variant="menu" />
         </span>
 
         <ul class="header__list">
@@ -391,11 +392,12 @@ onBeforeUnmount(() => {
 
   .header__toggle-label {
     display: block;
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 500;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.18em;
     line-height: 1;
-    margin-right: -0.16em; /* 字間分のずれを補正して中央に */
+    text-transform: uppercase;
+    margin-right: -0.18em; /* 字間分のずれを補正して中央に */
     color: rgba(25, 48, 76, 0.65);
   }
 
@@ -410,10 +412,8 @@ onBeforeUnmount(() => {
     gap: 0;
     padding: calc(var(--header-height) + 28px) clamp(24px, 6.5vw, 28px) 48px;
     overflow-x: hidden;
-    background:
-      radial-gradient(circle at 85% 5%, rgba(var(--glow-blue), 0.5), transparent 32%),
-      radial-gradient(circle at 5% 70%, rgba(var(--glow-blue), 0.45), transparent 38%),
-      linear-gradient(135deg, rgb(var(--surface-start)) 0%, rgb(var(--surface-mid)) 45%, rgb(var(--surface-end)) 100%);
+    /* 白 → ごく淡いブルー（濃くしない） */
+    background: linear-gradient(165deg, #FFFFFF 0%, #F7FBFF 50%, #EEF7FF 100%);
     transform: translateY(-8px);
     transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
   }
@@ -422,7 +422,7 @@ onBeforeUnmount(() => {
     transform: translateY(0);
   }
 
-  /* ---------- 背景装飾 ---------- */
+  /* ---------- 背景装飾（星座 / AI Network） ---------- */
   .header__menu-decor {
     display: block;
     position: absolute;
@@ -432,86 +432,22 @@ onBeforeUnmount(() => {
     pointer-events: none;
   }
 
-  /* 大きな淡い曲線（右上・左下） */
-  .header__menu-decor::before,
-  .header__menu-decor::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  .header__menu-decor::before {
-    top: -18%;
-    right: -45%;
-    width: 120%;
-    aspect-ratio: 1.3;
-    background: radial-gradient(ellipse at 40% 70%, rgba(var(--glow-blue), 0.45), rgba(var(--glow-blue), 0) 70%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.8);
-  }
-
-  .header__menu-decor::after {
-    bottom: -22%;
-    left: -40%;
-    width: 130%;
-    aspect-ratio: 1.4;
-    background: radial-gradient(ellipse at 55% 30%, rgba(var(--glow-blue), 0.4), rgba(var(--glow-blue), 0) 70%);
-    border-top: 1px solid rgba(255, 255, 255, 0.85);
-  }
-
-  /* 泡：大きさ・位置・速さを少しずつ変えて、ゆっくり漂う */
-  .header__bubble {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.75), rgba(185, 225, 250, 0.25) 55%, rgba(155, 205, 240, 0.1) 100%);
-    border: 1px solid rgba(150, 205, 240, 0.18);
-    box-shadow: 0 8px 30px rgba(120, 180, 220, 0.08);
-    opacity: 0.3;
-    pointer-events: none;
-    animation: bubbleFloat 12s ease-in-out infinite;
-    will-change: transform, opacity;
-  }
-
-  .header__bubble:nth-child(1) { left: 6%;  bottom: 12%; width: 70px; height: 70px; animation-duration: 14s; }
-  .header__bubble:nth-child(2) { right: 18%; top: 9%;   width: 24px; height: 24px; animation-duration: 10s; animation-delay: -3s; animation-direction: reverse; }
-  .header__bubble:nth-child(3) { right: 6%;  top: 72%;  width: 50px; height: 50px; animation-duration: 12s; animation-delay: -6s; }
-  .header__bubble:nth-child(4) { left: 38%;  top: 76%;  width: 28px; height: 28px; animation-duration: 9s;  animation-delay: -2s; animation-direction: reverse; }
-  .header__bubble:nth-child(5) { left: 46%;  bottom: 5%; width: 46px; height: 46px; animation-duration: 13s; animation-delay: -8s; }
-  .header__bubble:nth-child(6) { right: 22%; bottom: 18%; width: 36px; height: 36px; animation-duration: 11s; animation-delay: -5s; animation-direction: reverse; }
-
-  @keyframes bubbleFloat {
-    0% {
-      transform: translate3d(0, 0, 0) scale(1);
-      opacity: 0.28;
-    }
-    35% {
-      transform: translate3d(8px, -16px, 0) scale(1.04);
-      opacity: 0.42;
-    }
-    70% {
-      transform: translate3d(-5px, -28px, 0) scale(0.98);
-      opacity: 0.32;
-    }
-    100% {
-      transform: translate3d(0, 0, 0) scale(1);
-      opacity: 0.28;
-    }
-  }
-
   /* ---------- ナビ：文字＋右矢印＋細線 ---------- */
   .header__list {
     position: relative;
     z-index: 2;
   }
 
+  /* 区切り線：左から右へごく薄くなる 1px の線 */
   .header__list li {
-    border-bottom: 1px solid rgba(75, 105, 130, 0.16);
+    border-bottom: 0;
+    background: linear-gradient(90deg, rgba(50, 100, 150, 0.16), rgba(50, 100, 150, 0.06)) left bottom / 100% 1px no-repeat;
   }
 
-  /* メニューを開いたとき、上から順にふわっと表示 */
+  /* メニューを開いたとき、上から順にふわっと表示（バウンドなし） */
   .is-open .header__list li {
-    animation: mobileNavIn 0.4s ease both;
-    animation-delay: calc(var(--i) * 50ms + 80ms);
+    animation: mobileNavIn 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i) * 60ms + 80ms);
   }
 
   @keyframes mobileNavIn {
@@ -531,41 +467,43 @@ onBeforeUnmount(() => {
     justify-content: space-between;
     gap: 16px;
     padding: clamp(18px, 5vw, 24px) 0;
-    font-size: clamp(17px, 4.6vw, 19px);
+    font-size: clamp(15px, 4.2vw, 17px);
     font-weight: 500;
-    letter-spacing: 0.08em;
-    color: #1A2440;
+    line-height: 1.5;
+    letter-spacing: 0.06em;
+    color: #102A46;
     transition: color 0.25s ease;
   }
 
-  /* 右側の細い「＞」 */
+  /* 右側の細く小さい「＞」（thin chevron） */
   .header__link::after {
     display: block;
     position: static;
     left: auto;
     bottom: auto;
     flex-shrink: 0;
-    width: 9px;
-    height: 9px;
+    width: 7px;
+    height: 7px;
     margin-right: 4px;
-    margin-top: 2px;
+    margin-top: 1px;
     align-self: center;
     background: none;
-    border-top: 1.5px solid currentColor;
-    border-right: 1.5px solid currentColor;
+    border-top: 1.2px solid #173451;
+    border-right: 1.2px solid #173451;
     transform: rotate(45deg);
-    transition: transform 0.25s ease;
+    transition: transform 0.25s ease, border-color 0.25s ease;
   }
 
-  /* タップ時：文字が少し青く、矢印が少し右へ */
+  /* タップ時：文字と矢印が少し青く、矢印が少し右へ */
   .header__link:active,
   .header__link:hover {
-    color: #2B5FA8;
+    color: #1676D2;
   }
 
   .header__link:active::after,
   .header__link:hover::after {
-    transform: translateX(4px) rotate(45deg);
+    border-color: #1680DC;
+    transform: translateX(2px) rotate(45deg);
   }
 
   /* ---------- 見出し「まずは話を聞いてみる」（クリック不可） ---------- */
@@ -575,17 +513,31 @@ onBeforeUnmount(() => {
     align-self: flex-start;
     margin-top: clamp(34px, 8vw, 54px);
     padding: 0 0 14px;
-    font-size: clamp(18px, 5vw, 24px);
+    font-size: clamp(15px, 4.2vw, 17px);
     font-weight: 600;
     letter-spacing: 0.08em;
-    color: #173153;
+    color: #102A46;
   }
 
-  /* 短い下線（幅55%）：ごく薄い線＋左→右へ伸びる線（PCと同じ動き） */
+  /* 短い下線：ごく薄い線＋メニューを開いたとき左→右へ伸びるブルーの線（約100px） */
   .header__catch::before,
   .header__catch::after {
     bottom: 0;
-    width: 55%;
+    width: 100px;
+  }
+
+  .header__catch::after {
+    height: 1.5px;
+    background: linear-gradient(90deg, #1687DB, rgba(80, 180, 225, 0.35));
+    opacity: 1;
+    transform: scaleX(0);
+    animation: none;
+    transition: transform 0s;
+  }
+
+  .is-open .header__catch::after {
+    transform: scaleX(1);
+    transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1) 420ms;
   }
 }
 
@@ -609,7 +561,6 @@ onBeforeUnmount(() => {
     margin-left: 0 !important;
   }
 
-  .header__bubble,
   .is-open .header__list li {
     animation: none !important;
   }

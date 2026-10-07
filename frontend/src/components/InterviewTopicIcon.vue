@@ -73,7 +73,10 @@ const arcPath = 'M27 89.84 A46 46 0 0 1 5.57 38.1'
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle, #FFFFFF 55%, #F4F9FD 100%);
-  box-shadow: 0 10px 26px rgba(25, 45, 70, 0.06);
+  /* 白い円だけに、カード背景から少し浮いて見えるやわらかい影（弧には付けない） */
+  box-shadow:
+    0 10px 24px rgba(25, 55, 90, 0.08),
+    0 3px 8px rgba(25, 55, 90, 0.05);
   transition: transform 0.6s ease;
 }
 
@@ -216,6 +219,9 @@ const arcPath = 'M27 89.84 A46 46 0 0 1 5.57 38.1'
 @media (max-width: 767px) {
   .ti {
     --amp: 0.7;
+    box-shadow:
+      0 7px 18px rgba(25, 55, 90, 0.07),
+      0 2px 6px rgba(25, 55, 90, 0.04);
   }
 
   .ti-arc-path {

@@ -1,25 +1,39 @@
 <script setup>
+import AiNetworkBackground from './common/AiNetworkBackground.vue'
 import SectionHeading from './SectionHeading.vue'
+import GrowthIcon from './GrowthIcon.vue'
 
 defineProps({
   content: { type: Object, required: true }
 })
 
-// アイコン画像をCSSのマスクとして使う（色をCSSで統一するため）
-const iconStyle = (icon) => ({ '--icon': `url("${icon}")` })
+// アイコン周りの弧の回転（STEPごとに速さ・向きを変える）
+const ORBITS = [
+  { dur: 14, reverse: false },
+  { dur: 17, reverse: true },
+  { dur: 13, reverse: false },
+  { dur: 16, reverse: true }
+]
+const orbitStyle = (index) => {
+  const o = ORBITS[index % ORBITS.length]
+  return { '--orbit': `${o.dur}s`, animationDirection: o.reverse ? 'reverse' : 'normal' }
+}
 </script>
 
 <template>
   <section id="growth" class="section growth">
+    <!-- 背景：ごく淡いAIネットワーク（コンテンツの後ろ） -->
+    <AiNetworkBackground variant="growth" />
     <!-- 背景のごく淡い形（装飾） -->
     <span class="growth__wave growth__wave--tr" aria-hidden="true" />
     <span class="growth__wave growth__wave--br" aria-hidden="true" />
 
     <div class="container growth__inner">
-      <!-- 左：見出し・説明文 → 画像（＋手書き風メモ） -->
+      <!-- 上：見出し・説明文 → 横長のメイン画像（やや右寄せ）＋右上のメモ -->
       <div class="growth__intro">
         <SectionHeading
           v-reveal
+          class="growth__heading"
           :number="content.number"
           :english-title="content.englishTitle"
           :title="content.title"
@@ -35,7 +49,9 @@ const iconStyle = (icon) => ({ '--icon': `url("${icon}")` })
         </figure>
       </div>
 
-      <!-- 右：STEP 01〜04 の縦タイムライン（白い丸＋線画アイコン／細い線＋小さな点） -->
+      <!-- 下：STEP 01〜04 の縦タイムライン（メイン画像と同じ列にそろえる）
+           左：白い円＋線画アイコン（周りをゆっくり回る弧と青い点）／円と円をつなぐ線の上を、青い点が STEP 01 → 04 へ流れる
+           右：STEP ラベル・期間 → タイトル → 説明文 -->
       <ol class="growth__timeline">
         <li
           v-for="(step, index) in content.steps"
@@ -44,13 +60,30 @@ const iconStyle = (icon) => ({ '--icon': `url("${icon}")` })
           class="growth__step"
           :style="{ '--reveal-delay': `${index * 0.1}s`, '--i': index }"
         >
-          <span class="growth__icon" aria-hidden="true">
-            <span class="growth__icon-mark" :style="iconStyle(step.icon)" />
+          <span class="growth__visual" aria-hidden="true">
+            <!-- 円周の一部だけの細い弧＋弧の上の青い点（一緒に回る） -->
+            <svg class="growth__orbit" viewBox="0 0 100 100" :style="orbitStyle(index)">
+              <circle class="growth__arc growth__arc--main" cx="50" cy="50" r="47" pathLength="100" stroke-dasharray="28 72" />
+              <circle class="growth__arc growth__arc--sub" cx="50" cy="50" r="47" pathLength="100" stroke-dasharray="13 87" stroke-dashoffset="-48" />
+              <circle class="growth__orbit-dot" cx="41.2" cy="96.2" r="2.4" />
+            </svg>
+            <span class="growth__circle">
+              <span class="growth__icon">
+                <GrowthIcon :type="step.iconType" :index="index" />
+              </span>
+            </span>
           </span>
+
+          <!-- 次の STEP への線：途中の小さな点＋流れる青い点 -->
+          <span v-if="index < content.steps.length - 1" class="growth__flow" aria-hidden="true">
+            <span class="growth__flow-node" />
+            <span class="growth__flow-travel"><span class="growth__flow-dot" /></span>
+          </span>
+
           <div class="growth__step-body">
             <p class="growth__meta">
               <span class="growth__label">{{ step.label }}</span>
-              <span class="growth__period">{{ step.period }}</span>
+              <span v-if="step.period" class="growth__period">{{ step.period }}</span>
             </p>
             <h3 class="growth__title">{{ step.title }}</h3>
             <p class="growth__description">{{ step.description }}</p>
@@ -64,12 +97,15 @@ const iconStyle = (icon) => ({ '--icon': `url("${icon}")` })
 <style scoped>
 .growth {
   --g-ink: #14213A;
-  --g-sub: #697386;
-  --g-text: #5F6673;
-  --g-line: rgba(130, 185, 220, 0.35);
-  --g-dot: rgba(120, 185, 225, 0.65);
-  --g-icon: clamp(64px, 4.2vw, 80px);
-  --g-step-gap: clamp(36px, 3vw, 56px);
+  --g-sub: #66758A;
+  --g-text: #5B6A7E;
+  --g-navy: #0B2345;
+  --g-blue: #168AE8;
+  --g-circle: clamp(88px, 6.4vw, 108px);       /* 白い円 */
+  --g-box: calc(var(--g-circle) + 24px);       /* 弧を含めた大きさ＝タイムライン列の幅 */
+  --g-step-gap: clamp(44px, 3.6vw, 68px);
+  --g-flow: 9s;      /* 線の上の青い点：STEP 01 → 04 を流れる1周の長さ */
+  --g-orbit-k: 1;    /* 弧の回転の速さ（SPでは少しゆっくり） */
   --g-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -97,60 +133,77 @@ const iconStyle = (icon) => ({ '--icon': `url("${icon}")` })
   background: radial-gradient(ellipse, rgba(226, 242, 252, 0.28), rgba(226, 242, 252, 0) 70%);
 }
 
-/* ---------- PC：左 約46% ／ 右 約54% ---------- */
-.growth__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
-  gap: clamp(48px, 5vw, 110px);
-  align-items: stretch;
+/* ---------- PC：上に見出し・説明文・メイン画像、下に STEP（画像と同じ列） ---------- */
+.growth {
+  --g-col: min(72%, 980px);   /* メイン画像・STEP の幅 */
+  --g-col-right: 4%;          /* 右側の余白（やや右寄せ） */
 }
 
-/* 左：見出しは上、画像は下（右のSTEP 04と下端をそろえる） */
+.growth__inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(88px, 7.5vw, 140px);
+}
+
 .growth__intro {
   display: flex;
   flex-direction: column;
-  gap: clamp(48px, 4vw, 72px);
+  gap: clamp(64px, 5.5vw, 100px);
 }
 
+/* 03 の見出しだけ：番号とタイトルの間に細い縦線・英字ラベルは淡いブルー（共通の見出し部品は変更しない） */
+.growth__heading :deep(.heading__number) {
+  color: #BCC8D6;
+}
+
+.growth__heading :deep(.heading__body) {
+  position: relative;
+}
+
+.growth__heading :deep(.heading__body)::before {
+  content: '';
+  position: absolute;
+  top: 0.15em;
+  left: calc(clamp(24px, 2.2vw, 32px) / -2);
+  width: 1px;
+  height: clamp(60px, 5vw, 78px);
+  background: rgba(120, 150, 185, 0.35);
+}
+
+.growth__heading :deep(.heading__label) {
+  color: #8DB1D6;
+}
+
+.growth__heading :deep(.heading__description) {
+  margin-top: 22px;
+}
+
+/* メイン画像：横長・大きめ・やや右寄せ */
 .growth__figure {
   position: relative;
-  width: 100%;
-  max-width: 720px;
-  margin-top: auto;
-  margin-bottom: 0;
+  width: var(--g-col);
+  margin: 0 var(--g-col-right) 0 auto;
 }
 
-/* 画像の後ろの淡いブルーの四角（左上・右下に少しずらす） */
-.growth__figure::before,
-.growth__figure::after {
+/* 画像の左上〜左側の後ろに、ごく淡い水色の長方形（背景の星座とは別レイヤー） */
+.growth__figure::before {
   content: '';
   position: absolute;
   z-index: -1;
-  border-radius: 6px;
-  background: rgba(220, 239, 250, 0.45);
-  pointer-events: none;
-}
-
-.growth__figure::before {
-  top: -26px;
-  left: -36px;
-  width: 30%;
+  top: clamp(-36px, -2.4vw, -20px);
+  left: -11%;
+  width: 36%;
   height: 72%;
-}
-
-.growth__figure::after {
-  right: -28px;
-  top: -40px;
-  width: 22%;
-  height: 46%;
-  background: rgba(226, 242, 252, 0.4);
+  border-radius: 2px;
+  background: rgba(225, 244, 255, 0.65);
+  pointer-events: none;
 }
 
 .growth__media {
   aspect-ratio: 16 / 8.5;
-  border-radius: 8px;
+  border-radius: 3px;
   background: var(--color-border);
-  box-shadow: 0 14px 40px rgba(30, 50, 70, 0.06);
+  box-shadow: 0 16px 44px rgba(30, 60, 100, 0.06);
 }
 
 .growth__image {
@@ -160,43 +213,73 @@ const iconStyle = (icon) => ({ '--icon': `url("${icon}")` })
   object-position: center;
 }
 
-/* 手書き風メモ：画像の右上に少し重ねる */
+/* メモ：画像の右上に少し重ねる。白地＋細いブルーライン（付箋風にはしない） */
 .growth__note {
   position: absolute;
   z-index: 2;
-  top: clamp(-52px, -3.2vw, -36px);
-  right: clamp(-24px, -1.2vw, -8px);
+  top: clamp(-104px, -6.6vw, -68px);
+  right: clamp(-48px, -2.6vw, -16px);
 }
 
 .growth__note-inner {
+  position: relative;
   display: block;
-  padding: 8px 16px 10px;
-  background: rgba(255, 255, 255, 0.82);
+  padding: 12px 26px 14px 30px;
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(56, 150, 225, 0.55);
+  box-shadow: 0 8px 24px rgba(30, 60, 100, 0.05);
   font-family: var(--font-hand);
   font-size: clamp(14px, 1.05vw, 17px);
-  line-height: 1.7;
+  line-height: 1.75;
   letter-spacing: 0.12em;
-  color: var(--color-text);
-  transform: rotate(-5deg);
+  color: #22324A;
+  transform: rotate(-2deg);
   animation: growthNoteFloat 6.5s ease-in-out infinite;
 }
 
-@keyframes growthNoteFloat {
-  0%, 100% { transform: rotate(-5deg) translateY(0); }
-  50% { transform: rotate(-5deg) translateY(-3px); }
+/* 左の斜めの細いライン */
+.growth__note-inner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 1px;
+  height: 100%;
+  background: rgba(56, 150, 225, 0.55);
+  transform-origin: top center;
+  transform: rotate(20deg);
 }
 
-/* ---------- 右：縦タイムライン ---------- */
+/* 下のラインの端の小さな点 */
+.growth__note-inner::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4AA8F5;
+  box-shadow: 0 0 5px rgba(74, 168, 245, 0.3);
+}
+
+@keyframes growthNoteFloat {
+  0%, 100% { transform: rotate(-2deg) translateY(0); }
+  50% { transform: rotate(-2deg) translateY(-3px); }
+}
+
+/* ---------- 下：縦タイムライン（メイン画像と同じ列） ---------- */
 .growth__timeline {
   position: relative;
-  align-self: center;
+  width: var(--g-col);
+  margin: 0 var(--g-col-right) 0 auto;
 }
 
 .growth__step {
   position: relative;
   display: grid;
-  grid-template-columns: var(--g-icon) minmax(0, 1fr);
-  column-gap: clamp(24px, 2.4vw, 44px);
+  grid-template-columns: var(--g-box) minmax(0, 1fr);
+  column-gap: clamp(20px, 2vw, 36px);
   padding-bottom: var(--g-step-gap);
 }
 
@@ -204,98 +287,205 @@ const iconStyle = (icon) => ({ '--icon': `url("${icon}")` })
   padding-bottom: 0;
 }
 
-/* 丸と丸をつなぐ細い線（次の丸の上端まで） */
+/* 円と円をつなぐ縦線（円の下端 → 次の円の上端） */
 .growth__step:not(:last-child)::before {
   content: '';
   position: absolute;
-  left: calc(var(--g-icon) / 2 - 0.5px);
-  top: var(--g-icon);
-  bottom: 0;
+  left: calc(var(--g-box) / 2 - 0.5px);
+  top: calc(var(--g-box) - 12px);
+  bottom: -12px;
   width: 1px;
-  background: var(--g-line);
+  background: linear-gradient(to bottom, rgba(75, 170, 235, 0.18), rgba(75, 170, 235, 0.55), rgba(75, 170, 235, 0.18));
   transform-origin: top center;
   transition: transform 1.3s var(--g-ease);
   transition-delay: calc(var(--reveal-delay, 0s) + 0.2s);
 }
 
-/* 線の途中の小さな点 */
-.growth__step:not(:last-child)::after {
+/* ---------- アイコン：白い円＋周りを回る弧と青い点 ---------- */
+.growth__visual {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--g-box);
+  height: var(--g-box);
+}
+
+.growth__circle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--g-circle);
+  height: var(--g-circle);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(95, 170, 230, 0.18);
+  box-shadow:
+    0 12px 32px rgba(40, 90, 140, 0.08),
+    0 0 22px rgba(70, 170, 245, 0.07);
+}
+
+/* 青い点が STEP に届いたとき、円の周りの光がほんの少しだけ明るくなる */
+.growth__circle::after {
   content: '';
   position: absolute;
-  left: calc(var(--g-icon) / 2 - 3.5px);
-  top: calc((var(--g-icon) + 100%) / 2 - 3.5px);
-  width: 7px;
-  height: 7px;
+  inset: -4px;
   border-radius: 50%;
-  background: var(--g-dot);
+  box-shadow: 0 0 26px rgba(70, 170, 245, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  animation: growthPulse var(--g-flow) ease-in-out infinite;
+  animation-delay: calc(var(--i) * var(--g-flow) * 0.2667 - 0.4s);
+}
+
+.growth__icon {
+  display: block;
+  width: 54%;
+  height: 54%;
+}
+
+/* 円周の一部だけの弧（約40%）。STEPごとに違う速さ・向きでゆっくり回る */
+.growth__orbit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: growthOrbit calc(var(--orbit) * var(--g-orbit-k)) linear infinite;
+}
+
+.growth__arc {
+  fill: none;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.growth__arc--main {
+  stroke: rgba(44, 169, 245, 0.34);
+}
+
+.growth__arc--sub {
+  stroke: rgba(81, 194, 239, 0.24);
+}
+
+/* 弧の端の青い点（弧と一緒に回る） */
+.growth__orbit-dot {
+  fill: #38A9F5;
+  filter: drop-shadow(0 0 3.5px rgba(56, 169, 245, 0.4));
+}
+
+/* ---------- 線の上：途中の小さな点＋流れる青い点（データが次の STEP へ） ---------- */
+.growth__flow {
+  position: absolute;
+  z-index: 1;
+  left: calc(var(--g-box) / 2 - 6px);
+  top: calc(var(--g-box) - 12px);
+  bottom: -12px;
+  width: 12px;
+  pointer-events: none;
+}
+
+.growth__flow-node {
+  position: absolute;
+  top: calc(50% - 4.5px);
+  left: calc(50% - 4.5px);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #4AA8F5;
+  border: 2px solid #fff;
+  box-shadow: 0 0 6px rgba(74, 168, 245, 0.3);
   transition: opacity 0.5s ease, transform 0.5s var(--g-ease);
   transition-delay: calc(var(--reveal-delay, 0s) + 0.9s);
 }
 
-/* 白い丸＋線画アイコン（全ステップ同じ色） */
-.growth__icon {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: var(--g-icon);
-  height: var(--g-icon);
+/* 線の高さいっぱいを transform だけで移動。01→02 → 02→03 → 03→04 の順に1つずつ流れる */
+.growth__flow-travel {
+  position: absolute;
+  inset: 0;
+  animation: growthTravel var(--g-flow) linear infinite;
+  animation-delay: calc(var(--i) * var(--g-flow) * 0.2667);
+}
+
+.growth__flow-dot {
+  position: absolute;
+  top: -3px;
+  left: calc(50% - 3px);
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 8px 30px rgba(40, 70, 100, 0.04), 0 0 0 1px rgba(20, 33, 58, 0.04);
-  animation: growthIconFloat 7s ease-in-out infinite;
-  animation-delay: calc(var(--i) * -1.6s);
+  background: #4AA8F5;
+  box-shadow: 0 0 7px rgba(56, 169, 245, 0.35);
+  opacity: 0;
+  animation: growthFlowLight var(--g-flow) linear infinite;
+  animation-delay: calc(var(--i) * var(--g-flow) * 0.2667);
 }
 
-.growth__icon-mark {
-  width: 40%;
-  aspect-ratio: 1;
-  background-color: var(--g-ink);
-  -webkit-mask: var(--icon) center / contain no-repeat;
-  mask: var(--icon) center / contain no-repeat;
+@keyframes growthOrbit {
+  to { transform: rotate(360deg); }
 }
 
-@keyframes growthIconFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+@keyframes growthTravel {
+  0% { transform: translateY(0); }
+  26.67%, 100% { transform: translateY(100%); }
 }
 
+@keyframes growthFlowLight {
+  0% { opacity: 0; }
+  4%, 22% { opacity: 0.95; }
+  26.67%, 100% { opacity: 0; }
+}
+
+@keyframes growthPulse {
+  0%, 18%, 100% { opacity: 0; }
+  7% { opacity: 1; }
+}
+
+/* ---------- 右側のテキスト：STEP ラベル・期間 → タイトル → 説明文 ---------- */
 .growth__step-body {
-  max-width: 640px;
-  padding-top: clamp(4px, 0.6vw, 10px);
+  max-width: clamp(440px, 34vw, 600px); /* 読みやすい行の長さ（右端の背景装飾にもかからない） */
+  padding-top: clamp(10px, 1vw, 16px);
 }
 
 .growth__meta {
   display: flex;
-  align-items: baseline;
-  gap: 18px;
-  color: var(--g-sub);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
 }
 
+/* 小さなタグ（ボタンに見えないよう、枠なし・ごく薄い背景） */
 .growth__label {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  display: inline-block;
+  padding: 5px 12px 4px;
+  border-radius: 999px;
+  background: rgba(230, 244, 255, 0.7);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  color: var(--g-blue);
 }
 
 .growth__period {
   font-size: 13px;
   letter-spacing: 0.06em;
+  color: var(--g-sub);
 }
 
 .growth__title {
-  margin-top: 6px;
-  font-size: clamp(19px, 1.3vw, 24px);
-  font-weight: 600;
+  margin-top: 12px;
+  font-size: clamp(20px, 1.45vw, 26px);
+  font-weight: 700;
   line-height: 1.5;
-  letter-spacing: 0.06em;
-  color: var(--g-ink);
+  letter-spacing: 0.05em;
+  color: var(--g-navy);
 }
 
 .growth__description {
-  margin-top: 8px;
-  font-size: clamp(13px, 0.9vw, 15px);
+  margin-top: 10px;
+  font-size: clamp(13px, 0.92vw, 15px);
   line-height: 1.9;
   color: var(--g-text);
 }
@@ -325,91 +515,160 @@ const iconStyle = (icon) => ({ '--icon': `url("${icon}")` })
   transform: scaleY(0);
 }
 
-.growth__step.reveal:not(.is-visible)::after {
+.growth__step.reveal:not(.is-visible) .growth__flow-node {
   opacity: 0;
   transform: scale(0.8);
 }
 
-/* ---------- 1023px以下：1カラム（見出し → 画像 → タイムライン） ---------- */
-@media (max-width: 1023px) {
+/* ---------- PC（1024px以上）：左に見出し・説明文・画像＋メモ／右に STEP 01〜04 の2カラム ---------- */
+@media (min-width: 1024px) {
   .growth__inner {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 56px;
+    display: grid;
+    grid-template-columns: minmax(0, 44fr) minmax(0, 52fr);
+    column-gap: clamp(60px, 6vw, 110px);
+    align-items: start;
   }
 
+  /* 見出しの上端を右の STEP 01 の上端にそろえ、画像は左カラムの下側へ */
+  .growth__intro {
+    align-self: stretch;
+    padding-top: clamp(10px, 1vw, 16px); /* STEP 01 のラベル位置（本文の上余白）と同じ */
+    gap: clamp(64px, 5vw, 88px);
+  }
+
+  .growth__intro .growth__figure {
+    margin-top: auto;
+  }
+
+  /* 画像：左カラムに収まる少し横長の長方形（約 1.4 : 1）。手元と PC が中央に入るよう少し左寄りを切り出す */
   .growth__figure {
-    max-width: 640px;
-    margin-top: 24px;
+    width: 100%;
+    max-width: 560px;
+    margin: 0;
+  }
+
+  .growth__media {
+    aspect-ratio: 1.4 / 1;
+  }
+
+  .growth__image {
+    object-position: 45% center;
+  }
+
+  /* メモは画像の右上に少し重ねる（デザインはそのまま・位置だけ） */
+  .growth__note {
+    top: clamp(-56px, -3.4vw, -40px);
+    right: clamp(-40px, -2.4vw, -20px);
   }
 
   .growth__timeline {
-    align-self: stretch;
+    width: auto;
+    margin: 0;
+  }
+}
+
+/* ---------- 1023px以下：画像・STEP を広めに ---------- */
+@media (max-width: 1023px) {
+  .growth {
+    --g-col: 88%;
+    --g-col-right: 0%;
+  }
+
+  .growth__inner {
+    gap: 72px;
   }
 }
 
 /* ---------- SP ---------- */
 @media (max-width: 767px) {
   .growth {
-    --g-icon: 58px;
-    --g-step-gap: 32px;
+    --g-circle: 64px;
+    --g-box: 78px;
+    --g-step-gap: 40px;
+    --g-flow: 11s;
+    --g-orbit-k: 1.25;
+  }
+
+  /* SP：見出し → 説明文 → 画像（幅いっぱい）→ メモ（画像の右下）→ STEP の縦並び */
+  .growth {
+    --g-col: 100%;
+  }
+
+  .growth__inner {
+    gap: 56px;
   }
 
   .growth__intro {
-    gap: 40px;
-  }
-
-  .growth__figure {
-    max-width: none;
-    margin-top: 16px;
+    gap: 44px;
   }
 
   .growth__figure::before {
     top: -14px;
     left: -12px;
-  }
-
-  .growth__figure::after {
-    display: none;
+    width: 40%;
   }
 
   .growth__note {
-    top: -30px;
-    right: 6px;
+    position: static;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -14px;
+    padding-right: 4px;
   }
 
   .growth__note-inner {
     font-size: 13px;
-    padding: 6px 12px 8px;
+    padding: 9px 18px 10px 22px;
   }
 
   .growth__step {
-    column-gap: 16px;
+    column-gap: 14px;
   }
 
   .growth__step-body {
-    padding-top: 2px;
+    padding-top: 6px;
   }
 
   .growth__meta {
-    gap: 12px;
+    gap: 6px 10px;
+  }
+
+  .growth__label {
+    padding: 4px 10px 3px;
+    font-size: 12px;
+  }
+
+  .growth__period {
+    font-size: 12px;
   }
 
   .growth__title {
-    font-size: 19px;
+    margin-top: 8px;
+    font-size: 18px;
   }
 
   .growth__description {
     font-size: 13px;
   }
+
+  .growth__orbit-dot {
+    r: 3;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .growth__icon,
   .growth__note-inner,
   .growth__step::before,
-  .growth__step::after {
+  .growth__flow-node,
+  .growth__orbit,
+  .growth__flow-travel,
+  .growth__circle::after {
     animation: none !important;
     transition: none !important;
+  }
+
+  .growth__flow-dot {
+    display: none;
   }
 }
 </style>

@@ -90,128 +90,42 @@ main::before {
 
 /* ---------- セクションごとの配置 ---------- */
 
-/* 01 MEMBERS：右側に光 */
-#members::before {
-  content: '';
-  top: 0;
-  right: calc(var(--glow-size) * -0.45);
+/* ---------- 01〜06：White + Very Pale Blue のベース ----------
+   各セクションの下端の色＝次のセクションの上端の色にして、01→07 が1枚の背景のようにつながる。
+   点・線・多角形のネットワーク装飾は AiNetworkBackground.vue（各セクション内） */
+#members {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FBFDFF 100%);
 }
 
-/* 01 MEMBERS：左側に大きな淡い楕円（線ではなく面） */
-#members::after {
-  content: '';
-  top: 28%;
-  left: calc(var(--curve-size) * -0.45);
-  aspect-ratio: 1.6;
-  border: none;
-  background: radial-gradient(ellipse, rgba(var(--glow-blue), 0.22) 0%, rgba(var(--glow-blue), 0) 70%);
-}
-
-/* 02 OUR WORK：ごく薄いグレー（白いカードが少し浮いて見える） */
 #work {
-  background: var(--bg-soft-gray);
+  background: linear-gradient(180deg, #FBFDFF 0%, #F7FAFC 50%, #F5FAFF 100%);
 }
 
-/* 02 OUR WORK：左下にごく薄い水色 */
-#work::before {
-  content: '';
-  --glow-color: var(--glow-cyan);
-  --glow-size: clamp(360px, 36vw, 720px);
-  bottom: -20%;
-  left: calc(var(--glow-size) * -0.5);
+#growth {
+  background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 45%, #FBFDFF 100%);
 }
 
-/* 03 GROWTH STEP：白（左側に光＋曲線） */
-
-
-#growth::before {
-  content: '';
-  top: 10%;
-  left: calc(var(--glow-size) * -0.5);
-}
-
-#growth::after {
-  content: '';
-  top: -10%;
-  right: calc(100% - 18vw);
-}
-
-/* 04 AI時代の成長環境：ごく薄いブルーグレー（下端は白へ） */
 #support {
-  background: linear-gradient(180deg, #F8FBFD 0%, var(--bg-blue-gray) 55%, var(--bg-white) 100%);
+  background: linear-gradient(180deg, #FBFDFF 0%, #F2F8FD 55%, #FFFFFF 100%);
 }
 
-/* 05 CAREER PATH：右側に光＋曲線 */
-#career::before {
-  content: '';
-  --glow-size: clamp(460px, 52vw, 1000px);
-  top: -10%;
-  right: calc(var(--glow-size) * -0.48);
+#career {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FBFDFF 55%, #F7FBFE 100%);
 }
 
-#career::after {
-  content: '';
-  top: 0;
-  left: calc(100% - 16vw);
+#interview {
+  background: linear-gradient(180deg, #F7FBFE 0%, #FFFFFF 100%);
 }
 
-/* 06 INTERVIEW：白（画像が主役）＋左下に光 */
-
-#interview::before {
-  content: '';
-  --glow-size: clamp(400px, 40vw, 820px);
-  bottom: 0;
-  left: calc(var(--glow-size) * -0.5);
-}
-
-/* 07 FLOW：ごく薄いグレー → 白。波・曲線は FlowSection.vue 内 */
+/* 07 FLOW：白 → ごく淡いブルー（06 の下端 #FFFFFF から続く）。ネットワーク装飾は AiNetworkBackground.vue */
 #flow {
-  background: linear-gradient(180deg, var(--bg-soft-gray) 0%, var(--bg-white) 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FBFF 55%, #F2F8FD 100%);
 }
 
-/* 07 FLOW → Final CTA：左下から光 */
-#flow::before {
-  content: '';
-  --glow-color: var(--glow-cyan);
-  bottom: -35%;
-  left: calc(var(--glow-size) * -0.45);
-}
-
-/* ---------- スマホ：光を小さく・画面の端へ ---------- */
+/* ---------- スマホ ---------- */
 @media (max-width: 767px) {
-  #members::before,
-  #work::before,
-  #growth::before,
-  #career::before,
-  #flow::before {
-    --glow-size: 90vw;
-  }
-
   .section {
     --curve-size: 150vw;
-  }
-
-  #members::before,
-  #career::before {
-    right: -55vw;
-  }
-
-  #growth::before,
-  #work::before,
-  #flow::before {
-    left: -55vw;
-  }
-
-  #growth::after {
-    right: calc(100% - 10vw);
-  }
-
-  #members::after {
-    left: -100vw;
-  }
-
-  #career::after {
-    left: calc(100% - 10vw);
   }
 }
 

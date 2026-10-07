@@ -56,17 +56,6 @@ import interviewMain from '@/assets/images/interview/interview-main.png'
 import finalCtaPc from '@/assets/images/cta/final-cta-pc.png'
 import finalCtaSp from '@/assets/images/cta/final-cta-sp.png'
 
-// --- アイコン（線画） ---
-import iconBook from '@/assets/images/icons/book.svg'
-import iconCode from '@/assets/images/icons/code.svg'
-import iconTeam from '@/assets/images/icons/team.svg'
-import iconGrowth from '@/assets/images/icons/growth.svg'
-import iconPerson from '@/assets/images/icons/person.svg'
-import iconDocument from '@/assets/images/icons/document.svg'
-import iconChat from '@/assets/images/icons/chat.svg'
-import iconContract from '@/assets/images/icons/contract.svg'
-import iconFlag from '@/assets/images/icons/flag.svg'
-
 
 // ========================================
 // ロゴ（ヘッダー・フッター共通）
@@ -162,6 +151,7 @@ export const lpContent = {
         image: workWeb,
         alt: 'ノートPCでWebアプリを開発している様子',
         title: 'PM・PMO',
+        iconType: 'team', // アイコンの種類（team / ai / automation）
         description: '大手企業のDX・ITプロジェクトに参画し、会議運営、進捗・課題管理、関係者との調整などを担当します。経験を積みながら、要件整理や顧客折衝、プロジェクト全体を動かすPM業務へとステップアップしていきます。',
         tags: ['Excel', 'PowerPoint', 'Teams', 'Slack','生成AI'] // 技術タグ
       },
@@ -169,6 +159,7 @@ export const lpContent = {
         image: workMobile,
         alt: 'スマートフォンアプリを確認している様子',
         title: 'AI・DXツール導入支援',
+        iconType: 'ai',
         description: '大手企業を中心に、生成AIや業務効率化ツールの導入・活用を支援します。お客様の業務や課題を整理し、ツールの選定・導入から、活用方法の検討、現場への定着までサポートします。',
         tags: ['Microsoft Copilot', 'Power Platform（Power Apps等）', 'ChatGPT', 'Claude','Gemini','NotebookLM']
       },
@@ -176,6 +167,7 @@ export const lpContent = {
         image: workAi,
         alt: 'データ分析のダッシュボード画面',
         title: '業務自動化',
+        iconType: 'automation',
         description: 'n8nやAIを活用し、これまで人が手作業で行っていた業務を自動化します。業務フローを整理し、AIや各種サービスを組み合わせながら、実際に動く仕組みをつくります。',
         tags: ['n8n', 'Claude Code', 'Codex', 'API連携']
       }
@@ -190,40 +182,41 @@ export const lpContent = {
     number: '03',
     englishTitle: 'GROWTH STEP',
     title: '実践から始める、\nPREAIならではの\n成長ステップ',
-    description: '知識を学ぶだけではなく、\nAI・自動化ツールを実際に作るところからスタート。\n実務経験とキャリア支援を通じて、自分の強みを伸ばしていきます。',
+    description: '知識を学ぶだけではなく、\nAI・自動化ツールを実際に作るところからスタート。\n実務経験とキャリア支援を通じて、\n自分の強みを伸ばしていきます。',
     image: growthMain,
     alt: 'ノートPCでプログラミングを学ぶ様子',
     // 写真の上に表示される手書き風メッセージ
     note: '未経験から、\nできるを積み重ねよう。',
     // ステップ1つ = { … } 1つ
+    // iconType：'book' / 'code' / 'team' / 'growth' から選べます（線画アイコン：GrowthIcon.vue）
     steps: [
       {
         label: 'STEP 01',
         period: '入社〜1ヶ月',
         title: '実践型AI・IT研修',
         description: 'IT・AIの基礎を学びながら、n8nを使った業務自動化に挑戦。\n実際に自分で自動化ツールを作り、AIを「知っている」だけではなく\n「仕事で使える」状態を目指します。',
-        icon: iconBook
+        iconType: 'book'
       },
       {
         label: 'STEP 02',
         period: '2ヶ月目〜',
         title: 'OJT・プロジェクト参加',
         description: '先輩と一緒に実際のプロジェクトへ参画。\nPMOやAI・DXツールの導入支援など、実務を経験しながら仕事の進め方や\n顧客とのコミュニケーションを身につけます。',
-        icon: iconCode
+        iconType: 'code'
       },
       {
         label: 'STEP 03',
         // period: '4ヶ月〜',
         title: '定期的なキャリア1on1',
         description: '専属キャリアコンサルとの1on1を実施。\n現在の経験や強み、目指したいキャリアを整理し、\n次に身につけるスキルや挑戦する仕事を一緒に考えます。',
-        icon: iconTeam
+        iconType: 'team'
       },
       {
         label: 'STEP 04',
         // period: '1年目以降',
         title: '継続的なスキルアップ',
-        description: 'AI・ITの学習を継続しながら、要件定義やプロジェクトマネジメント、\nAI活用・業務自動化など、目指すキャリアに必要な専門性を伸ばしていきます。',
-        icon: iconGrowth
+        description: 'AI・ITの学習を継続しながら、要件定義やプロジェクトマネジメント、\n AI活用・業務自動化など、目指すキャリアに必要な専門性を伸ばしていきます。',
+        iconType: 'growth'
       }
     ]
   },
@@ -311,7 +304,7 @@ export const lpContent = {
     number: '06',
     englishTitle: 'INTERVIEW',
     title: '面接について',
-    description: '面接は応募を強く促すCTAではなく、\n『まずは面接で、仕事内容や会社について詳しく話を聞いてみてください』\nというクローズドLP向けのトーンにする。',
+    description: '面接は応募を強く促すCTAではなく、\n『まずは面接で、仕事内容や会社について詳しく話を聞いてみてください』というクローズドLP向けのトーンにする。',
     image: interviewMain,
     alt: '面接を担当する代表取締役のイラスト',
     // 画像左上の大きな飾り文字
@@ -347,7 +340,8 @@ export const lpContent = {
   // ========================================
   // 07 選考の流れ
   // ↓ 選考ステップ・期間・右側のメモはここで変更できます
-  //   highlight: true にしたステップはアクセントカラー（赤茶色）になります
+  //   highlight: true にしたステップはアクセントカラー（青）になります
+  //   iconType：アイコンの種類（FlowIcon.vue：document / chat / person / search / flag）
   // ========================================
   flow: {
     number: '07',
@@ -356,11 +350,11 @@ export const lpContent = {
     description: 'シンプルでスピーディーに、できるだけ早く結果をご連絡します。',
     note: '最短1週間で\nご連絡！', // 右側の小さなメモ
     items: [
-      { number: '01', title: '書類選考', period: '（1日）', icon: iconDocument },
-      { number: '02', title: 'カジュアル面談', period: '（オンライン/1回）', icon: iconChat },
-      { number: '03', title: '面接', period: '（1回）', icon: iconPerson },
-      { number: '04', title: '条件確認', period: '（1日）', icon: iconContract },
-      { number: '05', title: '内定', period: '', icon: iconFlag, highlight: true }
+      { number: '01', title: '書類選考', period: '（1日）', iconType: 'document' },
+      { number: '02', title: 'カジュアル面談', period: '（オンライン/1回）', iconType: 'chat' },
+      { number: '03', title: '面接', period: '（1回）', iconType: 'person' },
+      { number: '04', title: '条件確認', period: '（1日）', iconType: 'search' },
+      { number: '05', title: '内定', period: '', iconType: 'flag', highlight: true }
     ]
   },
 

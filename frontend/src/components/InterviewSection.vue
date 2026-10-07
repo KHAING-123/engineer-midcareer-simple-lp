@@ -1,4 +1,5 @@
 <script setup>
+import AiNetworkBackground from './common/AiNetworkBackground.vue'
 import SectionHeading from './SectionHeading.vue'
 import InterviewTopicIcon from './InterviewTopicIcon.vue'
 
@@ -9,6 +10,8 @@ defineProps({
 
 <template>
   <section id="interview" class="section interview">
+    <!-- 背景：ごく淡いAIネットワーク（コンテンツの後ろ） -->
+    <AiNetworkBackground variant="interview" />
     <div class="container interview__inner">
       <!-- PC 左上：見出し・説明文 -->
       <SectionHeading
@@ -196,7 +199,7 @@ defineProps({
   width: 100%;
   height: auto;
   object-fit: contain;
-  border-radius: clamp(12px, 1.3vw, 22px);
+  border-radius: 3px;
   box-shadow: 0 18px 50px rgba(40, 80, 110, 0.1);
 }
 
@@ -312,7 +315,7 @@ defineProps({
   padding: clamp(32px, 3vw, 52px) clamp(26px, 3vw, 52px) clamp(30px, 3vw, 48px);
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid rgba(40, 65, 95, 0.08);
-  border-radius: clamp(24px, 2.2vw, 32px);
+  border-radius: 4px;
   box-shadow: 0 18px 50px rgba(25, 45, 70, 0.04);
 }
 
@@ -381,7 +384,7 @@ defineProps({
   padding: clamp(20px, 2vw, 30px) clamp(20px, 2vw, 30px) clamp(22px, 2.2vw, 32px);
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 252, 254, 0.94) 35%, rgba(242, 248, 252, 0.88) 68%, rgba(232, 243, 250, 0.78) 100%);
   border: 1px solid rgba(40, 65, 90, 0.03);
-  border-radius: 24px;
+  border-radius: 4px;
   box-shadow: 0 14px 36px rgba(28, 55, 82, 0.025);
 }
 
