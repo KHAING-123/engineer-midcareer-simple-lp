@@ -304,7 +304,7 @@ export const lpContent = {
     number: '06',
     englishTitle: 'INTERVIEW',
     title: '面接について',
-    description: '面接は応募を強く促すCTAではなく、\n『まずは面接で、仕事内容や会社について詳しく話を聞いてみてください』というクローズドLP向けのトーンにする。',
+    description: '面接では、これまでの経験や強み、これから挑戦したいことをお聞きします。\nPREAIで経験できる仕事やキャリアについても詳しくお話しします。\nまずはお互いを知るところから始めましょう。',
     image: interviewMain,
     alt: '面接を担当する代表取締役のイラスト',
     // 画像左上の大きな飾り文字
