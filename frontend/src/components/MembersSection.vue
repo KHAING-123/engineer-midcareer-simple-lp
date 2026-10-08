@@ -15,6 +15,7 @@ defineProps({
       <SectionHeading
         v-reveal
         class="members__heading"
+        char-reveal
         :number="content.number"
         :english-title="content.englishTitle"
         :title="content.title"
@@ -302,8 +303,45 @@ defineProps({
     max-width: none;
   }
 
-  .members__figure::before {
-    display: none;
+  /* 画像の後ろの淡い四角：PC と同じ色・同じ角に、SP 用の小さめのずらし（画面端の余白 20px 内に収める） */
+  .members__item:nth-child(1) .members__figure::before {
+    top: -12px;
+    left: -12px;
+    width: 46%;
+    height: 40%;
+  }
+
+  .members__item:nth-child(2) .members__figure::before {
+    top: -12px;
+    left: -12px;
+    right: auto;
+    width: 50%;
+    height: 44%;
+  }
+
+  .members__item:nth-child(3) .members__figure::before {
+    top: -12px;
+    right: -12px;
+    width: 70%;
+    height: 32%;
+  }
+}
+
+/* SP：画像が左右交互にスライドして登場（1・3枚目は左から、2枚目は右から）。
+   既存のスクロール表示（v-reveal：画面に入ったら1回だけ）を使い、下からの動きを横からの動きに置き換える */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .members__item.reveal {
+    transform: translateX(-70px);
+    transition-duration: 0.8s;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .members__item.reveal:nth-child(2) {
+    transform: translateX(70px);
+  }
+
+  .members__item.reveal.is-visible {
+    transform: translateX(0);
   }
 }
 

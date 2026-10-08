@@ -15,6 +15,7 @@ defineProps({
     <div class="container">
       <SectionHeading
         v-reveal
+        char-reveal
         :number="content.number"
         :english-title="content.englishTitle"
         :title="content.title"
@@ -54,10 +55,14 @@ defineProps({
 
 /* カード：白・細い枠線・ごく弱い影（中身は 背景装飾 → アイコン・文字 の順に重なる） */
 .career__item {
-  --deco: #F4F7FA;
-  --deco-2: #EEF3F7;
-  --deco-line: rgba(35, 55, 80, 0.05);
-  --deco-dot: rgba(36, 54, 77, 0.12);
+  /* 背景装飾の色：ホワイト＋ごく淡いブルー */
+  --deco: #E2F3FF;                          /* 曲線・円・多角形 */
+  --deco-2: #F0F8FF;                        /* 薄い方 */
+  --deco-accent: rgba(184, 226, 255, 0.55); /* 少しだけ濃い面 */
+  --deco-line: rgba(120, 180, 230, 0.22);   /* 斜線 */
+  --deco-dot: rgba(110, 175, 230, 0.4);     /* ドット */
+  --icon-y: calc(clamp(26px, 2.2vw, 34px) + clamp(10px, 1vw, 16px) + clamp(35px, 2.5vw, 43px)); /* アイコンの中心の高さ */
+  --icon-r: clamp(46px, 3.6vw, 60px);       /* アイコンの後ろの円 */
 
   position: relative;
   isolation: isolate;
@@ -65,10 +70,11 @@ defineProps({
   flex-direction: column;
   align-items: flex-start;
   padding: clamp(26px, 2.2vw, 34px) clamp(20px, 1.8vw, 30px) clamp(28px, 2.4vw, 36px);
-  background: #FFFFFF;
-  border: 1px solid #E1E7ED;
+  /* 白 → 下に向かってごく淡いブルー */
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 45%, #F7FBFF 75%, #F0F8FF 100%);
+  border: 1px solid #E2EDF7;
   border-radius: 3px;
-  box-shadow: 0 12px 32px rgba(20, 38, 60, 0.045);
+  box-shadow: 0 12px 32px rgba(30, 70, 120, 0.05);
   text-align: left;
   transition: transform 0.6s ease, box-shadow 0.6s ease;
 }
@@ -96,6 +102,20 @@ defineProps({
   position: absolute;
 }
 
+/* 01〜03：アイコンの後ろの淡いブルーの円（02 は周りに小さな半透明の円も） */
+.career__item:nth-child(1) .career__decor,
+.career__item:nth-child(3) .career__decor {
+  background: radial-gradient(circle var(--icon-r) at 50% var(--icon-y), var(--deco) 0%, rgba(226, 243, 255, 0.55) 78%, transparent 100%);
+}
+
+.career__item:nth-child(2) .career__decor {
+  background:
+    radial-gradient(circle calc(var(--icon-r) * 0.24) at calc(50% - var(--icon-r) * 0.82) calc(var(--icon-y) - var(--icon-r) * 0.62), var(--deco-accent) 0%, rgba(184, 226, 255, 0.15) 90%, transparent 100%),
+    radial-gradient(circle calc(var(--icon-r) * 0.14) at calc(50% + var(--icon-r) * 0.95) calc(var(--icon-y) + var(--icon-r) * 0.7), var(--deco-accent) 0%, transparent 100%),
+    radial-gradient(circle calc(var(--icon-r) * 0.18) at calc(50% - var(--icon-r) * 0.7) calc(var(--icon-y) + var(--icon-r) * 0.72), rgba(184, 226, 255, 0.35) 0%, transparent 100%),
+    radial-gradient(circle var(--icon-r) at 50% var(--icon-y), var(--deco) 0%, rgba(226, 243, 255, 0.55) 78%, transparent 100%);
+}
+
 /* 小さなドットの並び（共通の作り方） */
 .career__item:nth-child(1) .career__decor::after,
 .career__item:nth-child(3) .career__decor::after {
@@ -110,7 +130,7 @@ defineProps({
   width: 150%;
   height: 46%;
   border-radius: 50% 50% 0 0 / 70% 70% 0 0;
-  background: linear-gradient(100deg, rgba(244, 247, 250, 0) 10%, var(--deco) 60%, var(--deco-2) 100%);
+  background: linear-gradient(100deg, rgba(226, 243, 255, 0) 10%, var(--deco) 60%, rgba(184, 226, 255, 0.6) 100%);
   transform: rotate(-6deg);
 }
 
@@ -139,11 +159,11 @@ defineProps({
   width: 78%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--deco);
+  background: linear-gradient(30deg, rgba(184, 226, 255, 0.55), var(--deco) 70%);
 }
 
 .career__item:nth-child(3) .career__decor::after {
-  top: 30%;
+  top: calc(var(--icon-y) + 8px);
   right: 14px;
   width: 54px;
   height: 45px;
@@ -155,9 +175,8 @@ defineProps({
   left: 6%;
   width: 70%;
   height: 34%;
-  background: var(--deco);
+  background: linear-gradient(160deg, var(--deco), var(--deco-2));
   clip-path: polygon(0 50%, 34% 0, 100% 12%, 82% 100%, 22% 92%);
-  opacity: 0.8;
 }
 
 .career__item:nth-child(4) .career__decor::after {
@@ -165,8 +184,7 @@ defineProps({
   bottom: 0;
   width: 46%;
   height: 34%;
-  background: var(--deco-2);
-  opacity: 0.7;
+  background: linear-gradient(315deg, rgba(184, 226, 255, 0.6), var(--deco) 60%);
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 
@@ -192,7 +210,7 @@ defineProps({
   width: 150%;
   height: 42%;
   border-radius: 50% 50% 0 0 / 80% 80% 0 0;
-  background: linear-gradient(80deg, var(--deco) 0%, rgba(244, 247, 250, 0) 80%);
+  background: linear-gradient(80deg, rgba(184, 226, 255, 0.55) 0%, var(--deco) 40%, rgba(226, 243, 255, 0) 85%);
 }
 
 /* ---------- 右上の番号（装飾） ---------- */

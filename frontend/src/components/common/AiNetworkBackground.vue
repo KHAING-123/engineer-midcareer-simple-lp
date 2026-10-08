@@ -10,7 +10,7 @@
 import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
-  // 'members' | 'work' | 'growth' | 'support' | 'career' | 'interview' | 'flow' | 'menu'（SPメニュー）
+  // 'members' | 'work' | 'growth' | 'support' | 'career' | 'interview' | 'flow' | 'menu'（SPメニュー） | 'opening'（オープニング） | 'header'
   variant: { type: String, required: true }
 })
 
@@ -27,7 +27,8 @@ const props = defineProps({
     orbits: 曲線（円の一部）＋曲線上を進む点 { cx, cy, r, from, to, dur, delay }
     o     : 全体の濃さ（コンテンツに近いものは低く）
     pcOnly: SP では表示しない（SPの装飾量を約半分にするため）
-    x / y : 置く角からのずらし（px。省略時 0）
+    spOnly: SP（767px 以下）だけ表示
+    x / y : 置く角からのずらし（数値は px、'16%' のような文字列も可。省略時 0）
     wideOnly: 1199px 以下では表示しない（07 のメモがフローの下へ回り込む幅で、メモの後ろに来ないように）
 */
 const VARIANTS = {
@@ -235,6 +236,64 @@ const VARIANTS = {
     ]
   },
 
+  // ヘッダー（高さ 56〜60px）：ロゴ・ナビ・ボタンの後ろは避け、余白にだけ小さく配置
+  header: {
+    clusters: [
+      // PC：ロゴとナビの間の余白に、横長の小さな星座（1200px 以上）
+      {
+        at: 'tl', x: '16%', w: 280, h: 60, o: 0.75, float: 16, pcOnly: true, wideOnly: true,
+        nodes: [[0, 38], [49, 14], [107, 30], [157, 10], [206, 40], [255, 18], [280, 46], [78, 50]],
+        edges: '0-1 1-2 2-3 3-4 4-5 5-6d 1-7d 7-2 2-4d',
+        polys: [[1, 2, 7]],
+        pulse: [[3, 0], [5, 2.5]],
+        pulseDur: 5.5,
+        movers: [{ p: [0, 1, 2, 3, 4, 5], dur: 12, delay: -3 }]
+      },
+      // PC：右端の余白（ボタンの右）に、ごく小さな三角形（1200px 以上）
+      {
+        at: 'tr', w: 64, h: 60, o: 0.7, float: 18, pcOnly: true, wideOnly: true,
+        nodes: [[64, 10], [30, 24], [50, 50], [10, 44]],
+        edges: '0-1 1-2 2-3d 1-3',
+        pulse: [[1, 1.2]],
+        pulseDur: 6
+      },
+      // SP：ロゴとメニューボタンの間に1つだけ（PC より小さく・薄く）
+      {
+        at: 'tl', x: 140, w: 220, h: 108, o: 0.6, float: 16, spOnly: true,
+        nodes: [[0, 70], [50, 30], [110, 60], [160, 22], [220, 56], [80, 96], [190, 96]],
+        edges: '0-1 1-2 2-3 3-4 2-5d 5-0 4-6d',
+        polys: [[0, 1, 2, 5]],
+        pulse: [[3, 0.5]],
+        pulseDur: 5.5,
+        movers: [{ p: [0, 1, 2, 3, 4], dur: 10, delay: -2 }]
+      }
+    ]
+  },
+
+  // オープニング画面：中央（ロゴ・メッセージ）はあけ、右上と左下の角にだけ配置
+  opening: {
+    clusters: [
+      {
+        at: 'tr', w: 520, h: 380, o: 0.9, float: 14,
+        nodes: [[520, 40], [430, 20], [340, 70], [420, 140], [520, 180], [300, 170], [380, 250], [480, 300], [220, 60], [160, 140]],
+        edges: '0-1 1-2 2-3 3-0d 3-4 2-5 5-3 5-6 6-7 7-4d 2-8 8-9 9-5d',
+        polys: [[1, 2, 3], [5, 6, 3]],
+        pulse: [[3, 0], [6, 1.5]],
+        pulseDur: 5,
+        movers: [{ p: [9, 8, 2, 3, 4], dur: 10, delay: -2 }]
+      },
+      {
+        at: 'bl', w: 560, h: 360, o: 0.9, float: 16,
+        nodes: [[0, 120], [90, 60], [200, 140], [120, 240], [30, 330], [300, 90], [380, 200], [280, 300], [480, 280], [560, 360], [420, 360]],
+        edges: '0-1 1-2 2-3 3-0d 3-4 1-5 5-6 6-2 6-7 7-3 7-8 8-9d 8-10 10-7d 6-8',
+        polys: [[1, 2, 5], [6, 7, 8]],
+        pulse: [[2, 0.8], [8, 2.2]],
+        pulseDur: 5,
+        movers: [{ p: [0, 1, 5, 6, 8, 9], dur: 11, delay: -3 }]
+      }
+    ]
+  },
+
   // SPメニュー：文字の後ろは避け、右上・左端・下部の余白に配置（SPでは座標×0.52 の大きさ）
   menu: {
     clusters: [
@@ -288,9 +347,11 @@ const reduceQuery = mq('(prefers-reduced-motion: reduce)')
 const isSp = ref(!!spQuery?.matches)
 const motionOk = ref(!reduceQuery?.matches)
 
+// x / y：数値は px、文字列（例 '16%'）はそのまま
+const len = (v) => (typeof v === 'string' ? v : `${v || 0}px`)
 const corner = (at, extra = {}) => ({
-  [at[0] === 't' ? 'top' : 'bottom']: `${extra.y || 0}px`,
-  [at[1] === 'l' ? 'left' : 'right']: `${extra.x || 0}px`
+  [at[0] === 't' ? 'top' : 'bottom']: len(extra.y),
+  [at[1] === 'l' ? 'left' : 'right']: len(extra.x)
 })
 
 const rad = (deg) => (deg * Math.PI) / 180
@@ -417,7 +478,7 @@ const clusters = computed(() =>
         floatStyle: { animationDuration: `${c.float || 15}s` }
       }
     })
-    .filter((c) => !(isSp.value && c.pcOnly))
+    .filter((c) => !(isSp.value && c.pcOnly) && !(!isSp.value && c.spOnly))
 )
 
 const grids = computed(() =>

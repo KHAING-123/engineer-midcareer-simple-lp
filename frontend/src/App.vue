@@ -1,6 +1,7 @@
 <script setup>
 import { lpContent } from './data/lpContent'
 
+import OpeningAnimation from './components/OpeningAnimation.vue'
 import Header from './components/Header.vue'
 import HeroSection from './components/HeroSection.vue'
 import MembersSection from './components/MembersSection.vue'
@@ -16,6 +17,8 @@ import SectionDivider from './components/common/SectionDivider.vue'
 </script>
 
 <template>
+  <!-- 初回のみのオープニング（同じタブでは再生しない）。終了後は DOM から削除 -->
+  <OpeningAnimation :logo="lpContent.header.logo" />
   <Header :content="lpContent.header" />
   <main>
     <HeroSection :content="lpContent.hero" />

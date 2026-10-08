@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import SectionHeading from './SectionHeading.vue'
 import FlowIcon from './FlowIcon.vue'
 import AiNetworkBackground from './common/AiNetworkBackground.vue'
@@ -15,6 +15,84 @@ const noteParts = computed(() =>
     accent: text === '1週間'
   }))
 )
+
+// ---------- SP：ジグザグの接続線（01 → 05 → メモ）。点線と動く点は同じ path を使う ----------
+const bodyEl = ref(null)
+const listEl = ref(null)
+const noteLinkEl = ref(null)
+const routeD = ref('')
+const routeArrows = ref([]) // 01→02〜04→05 の線の中央の矢印（位置と向き）
+
+// transform（表示アニメーション）の影響を受けない、.flow__body から見た位置
+const offsetIn = (el, root) => {
+  let x = 0
+  let y = 0
+  while (el && el !== root) {
+    x += el.offsetLeft
+    y += el.offsetTop
+    el = el.offsetParent
+  }
+  return { x, y }
+}
+
+const buildRoute = () => {
+  const body = bodyEl.value
+  const list = listEl.value
+  if (!body || !list || !window.matchMedia('(max-width: 767px)').matches) {
+    routeD.value = ''
+    routeArrows.value = []
+    return
+  }
+  const centers = [...list.querySelectorAll('.flow__visual')].map((v) => {
+    const p = offsetIn(v, body)
+    return { x: p.x + v.offsetWidth / 2, y: p.y + v.offsetHeight / 2 }
+  })
+  const circle = list.querySelector('.flow__circle')
+  const r = (circle ? circle.offsetWidth / 2 : 36) + 6 // 円の少し外から線を始める（アイコンに重ねない）
+  const f = (n) => n.toFixed(1)
+  const parts = []
+  const arrows = []
+  // 円と円：上の円の下端 → 次の円の上端へ斜めに（行と行のすき間を通り、文字に重ならない）
+  for (let i = 0; i < centers.length - 1; i++) {
+    const a = centers[i]
+    const b = centers[i + 1]
+    const sy = a.y + r
+    const ey = b.y - r
+    parts.push(`M${f(a.x)} ${f(sy)} L${f(b.x)} ${f(ey)}`)
+    // 線の中央に、線の向き（↘ / ↙）にそろえた小さな矢印
+    const angle = (Math.atan2(ey - sy, b.x - a.x) * 180) / Math.PI
+    arrows.push({ x: f((a.x + b.x) / 2), y: f((sy + ey) / 2), angle: angle.toFixed(1) })
+  }
+  routeArrows.value = arrows
+  // 05 → メモ：円の下から下へ、メモの高さで右へ曲がり、メモ左の点まで
+  const link = noteLinkEl.value
+  const last = centers[centers.length - 1]
+  if (link && last) {
+    const p = offsetIn(link, body)
+    const dot = { x: p.x + link.offsetWidth - 4, y: p.y + link.offsetHeight / 2 }
+    parts.push(`M${f(last.x)} ${f(last.y + r)} L${f(last.x)} ${f(dot.y)} L${f(dot.x)} ${f(dot.y)}`)
+  }
+  routeD.value = parts.join(' ')
+}
+
+let resizeObserver
+let spQuery
+onMounted(async () => {
+  await nextTick()
+  buildRoute()
+  document.fonts?.ready.then(buildRoute)
+  spQuery = window.matchMedia('(max-width: 767px)')
+  spQuery.addEventListener('change', buildRoute)
+  if ('ResizeObserver' in window && bodyEl.value) {
+    resizeObserver = new ResizeObserver(() => buildRoute())
+    resizeObserver.observe(bodyEl.value)
+  }
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+  spQuery?.removeEventListener('change', buildRoute)
+})
 </script>
 
 <template>
@@ -25,15 +103,30 @@ const noteParts = computed(() =>
     <div class="container">
       <SectionHeading
         v-reveal
+        char-reveal
         :number="content.number"
         :english-title="content.englishTitle"
         :title="content.title"
         :description="content.description"
       />
 
-      <div class="flow__body">
+      <div ref="bodyEl" class="flow__body">
+        <!-- SPのみ：ジグザグの点線（01 → 05 → メモ）と、その上をゆっくり進む小さな青い点（同じ path） -->
+        <svg v-if="routeD" class="flow__route" aria-hidden="true">
+          <path :d="routeD" />
+          <g
+            v-for="(arrow, i) in routeArrows"
+            :key="i"
+            class="flow__route-arrow"
+            :transform="`translate(${arrow.x} ${arrow.y}) rotate(${arrow.angle})`"
+          >
+            <path d="M-6 0 H5 M1 -4 L5 0 L1 4" />
+          </g>
+        </svg>
+        <span v-if="routeD" class="flow__route-dot" :style="{ offsetPath: `path('${routeD}')` }" aria-hidden="true" />
+
         <!-- 5ステップ：番号 → アイコン（白い円＋回る弧＋点） → 名称 → 期間。ステップ間は点線＋矢印 -->
-        <ol class="flow__list">
+        <ol ref="listEl" class="flow__list">
           <li
             v-for="(item, index) in content.items"
             :key="item.number"
@@ -89,7 +182,7 @@ const noteParts = computed(() =>
 
         <!-- 右端のメモ：最短1週間でご連絡！ -->
         <div v-if="content.note" v-reveal class="flow__note" :style="{ '--reveal-delay': '0.4s' }">
-          <span class="flow__note-link" aria-hidden="true" />
+          <span ref="noteLinkEl" class="flow__note-link" aria-hidden="true" />
           <div class="flow__note-card">
             <svg class="flow__clock" viewBox="0 0 40 40" aria-hidden="true">
               <circle class="flow__clock-face" cx="20" cy="20" r="15" />
@@ -548,7 +641,7 @@ const noteParts = computed(() =>
       inset 0 0 0 1px rgba(255, 255, 255, 0.75);
     --flow-circle: 72px;
     --flow-box: calc(var(--flow-circle) + 18px);
-    --flow-step-gap: 34px;
+    --flow-step-gap: 52px; /* ジグザグの斜めの線が通るすき間 */
   }
 
   .flow__body {
@@ -603,76 +696,116 @@ const noteParts = computed(() =>
     font-size: 12.5px;
   }
 
-  /* 接続：ステップの下端から次のステップまで、縦の点線＋下向き矢印 */
+  /* ---------- ジグザグ：01・03・05 は左にアイコン、02・04 は右にアイコン（文字は右寄せ） ---------- */
+  .flow__body {
+    position: relative;
+  }
+
+  .flow__list {
+    position: relative;
+    z-index: 1;
+  }
+
+  .flow__item:nth-child(even) {
+    grid-template-columns: minmax(0, 1fr) var(--flow-box);
+    text-align: right;
+  }
+
+  .flow__item:nth-child(even) .flow__visual {
+    grid-column: 2;
+  }
+
+  .flow__item:nth-child(even) .flow__number,
+  .flow__item:nth-child(even) .flow__title,
+  .flow__item:nth-child(even) .flow__period {
+    grid-column: 1;
+  }
+
+  /* SPでは各ステップの縦の接続線の代わりに、下のジグザグの線を使う */
   .flow__connector {
-    top: auto;
-    bottom: calc(var(--flow-step-gap) * -1);
-    left: calc(var(--flow-box) / 2 - 6px);
-    width: 12px;
-    height: var(--flow-step-gap);
-    transform: none;
-    background: radial-gradient(circle, var(--flow-line) 1px, transparent 1.4px) center / 4px 5px repeat-y;
+    display: none;
   }
 
-  .flow__connector-arrow {
-    top: calc(50% - 7px);
-    left: -1px;
-    width: 14px;
-    height: 14px;
-    padding: 1px;
-    transform: rotate(90deg);
-    background: radial-gradient(circle, #fbfdff 55%, transparent 72%);
+  /* ジグザグの点線：アイコン・文字の後ろ（円の外側から始まるので重ならない） */
+  .flow__route {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
   }
 
-  .flow__connector-light {
-    top: -2.5px;
-    left: calc(50% - 2.5px);
+  .flow__route path {
+    fill: none;
+    stroke: var(--flow-line);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 0 6;
   }
 
-  .flow__connector-travel {
-    animation-name: flowTravelY;
+  /* 線の中央の小さな矢印（約11px・細い線・ネイビー。動かさない） */
+  .flow__route .flow__route-arrow path {
+    stroke: var(--flow-arrow);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    stroke-dasharray: none;
   }
 
-  /* メモは中央のまま、左に点線（05 の円の列から下へ → 横へメモ左の点まで）。右側は同じ幅のすき間で中央をそろえる */
+  /* 動く点：点線と同じ path の上を 01 → 05 → メモへ進み、少し休んでから最初へ */
+  .flow__route-dot {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--flow-blue);
+    box-shadow: 0 0 6px rgba(30, 140, 230, 0.35);
+    offset-rotate: 0deg;
+    offset-distance: 0%;
+    opacity: 0;
+    pointer-events: none;
+    animation: flowRoute 11s linear infinite;
+  }
+
+  /* メモは右下（ステップの列の右端にそろえる）。左の点がジグザグの線の終点 */
   .flow__note {
-    --flow-note-x: calc(max(0px, (100% - 420px) / 2) + var(--flow-box) / 2);
-    align-self: stretch;
-    margin: 44px 0 0;
-  }
-
-  .flow__note::after {
-    content: '';
-    flex: 1;
-    margin-left: calc(var(--flow-note-x) + 4px);
+    align-self: flex-end;
+    margin: 48px max(0px, (100% - 420px) / 2) 0 0;
   }
 
   .flow__note-link {
     display: block;
-    flex: 1;
-    align-self: stretch;
-    width: auto;
-    height: auto;
-    margin: 0 4px 0 var(--flow-note-x);
-  }
-
-  /* 縦の点線：05 の円の下端からメモの高さの中央まで（各ステップ間の縦線と同じ点） */
-  .flow__note-link::before {
-    content: '';
-    position: absolute;
-    left: -6px;
-    top: calc(-44px - (var(--flow-box) - var(--flow-circle)) / 2);
-    width: 12px;
-    height: calc(50% + 44px + (var(--flow-box) - var(--flow-circle)) / 2);
-    background: radial-gradient(circle, var(--flow-line) 1px, transparent 1.4px) center / 4px 5px repeat-y;
-  }
-
-  .flow__note-link::after {
-    top: calc(50% - 4px);
+    width: 14px;
+    margin-top: 0;
+    margin-right: 8px;
+    align-self: center;
+    background: none;
   }
 
   .flow__note-card {
     padding: 18px 26px 18px 20px;
   }
+}
+
+/* SP のジグザグの線（PC・タブレットでは使わない） */
+@media (min-width: 768px) {
+  .flow__route,
+  .flow__route-dot {
+    display: none;
+  }
+}
+
+@keyframes flowRoute {
+  0% { offset-distance: 0%; opacity: 0; }
+  3% { opacity: 0.9; }
+  84% { offset-distance: 100%; opacity: 0.9; }
+  88%, 100% { offset-distance: 100%; opacity: 0; }
 }
 
 @keyframes flowTravelY {
@@ -692,7 +825,8 @@ const noteParts = computed(() =>
     animation: none !important;
   }
 
-  .flow__connector-light {
+  .flow__connector-light,
+  .flow__route-dot {
     display: none;
   }
 

@@ -32,6 +32,7 @@ const ORBIT = [12, 14, 11]
     <div class="container">
       <SectionHeading
         v-reveal
+        char-reveal
         class="work__heading"
         :number="content.number"
         :english-title="content.englishTitle"
@@ -184,10 +185,40 @@ const ORBIT = [12, 14, 11]
 }
 
 .work__body {
+  position: relative;
+  isolation: isolate; /* 下の曲線装飾を本文・タグの後ろに閉じ込める */
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 0 var(--w-pad) clamp(28px, 2.4vw, 40px);
+  /* 白 → ごく淡いブルーホワイト → 淡いライトブルー */
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 22%, #F7FBFF 58%, #EAF5FF 100%);
+}
+
+/* カード下部の控えめな曲線装飾（淡いブルーの面＋細い曲線） */
+.work__body::before,
+.work__body::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -20%;
+  right: -20%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.work__body::before {
+  bottom: -62%;
+  height: 90%;
+  background: radial-gradient(ellipse at 60% 20%, rgba(214, 234, 252, 0.55), rgba(214, 234, 252, 0) 70%);
+  transform: rotate(-6deg);
+}
+
+.work__body::after {
+  bottom: -70%;
+  height: 100%;
+  border-top: 1px solid rgba(150, 195, 235, 0.32);
+  transform: rotate(-8deg);
 }
 
 /* アイコンは画像の下端に半分重ね、タイトルはその右（画像の下から始める） */
@@ -257,6 +288,23 @@ const ORBIT = [12, 14, 11]
 .work__glyph * {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/* PM・PMO / AI・DX：円の内側のイラストだけが、ゆっくり縮小 → 拡大 → 縮小（白い円・外周の弧は動かさない）
+   54% × 1.12 ≒ 60% なので、拡大しても円の内側に収まる */
+.work__icon--team .work__glyph,
+.work__icon--ai .work__glyph {
+  transform-origin: center;
+  animation: workGlyphBreath 3s ease-in-out infinite;
+}
+
+.work__icon--ai .work__glyph {
+  animation-delay: -1.5s; /* 2枚が同時に動かないよう半周期ずらす */
+}
+
+@keyframes workGlyphBreath {
+  0%, 100% { transform: scale(0.9); }
+  50% { transform: scale(1.12); }
 }
 
 .wi-ink,
@@ -408,10 +456,12 @@ const ORBIT = [12, 14, 11]
 
 .work__tag {
   padding: 6px 12px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 249, 255, 0.92));
-  border: 1px solid rgba(80, 130, 180, 0.14);
+  background: linear-gradient(180deg, #FFFFFF, #FBFDFF);
+  border: 1px solid rgba(120, 175, 225, 0.2);
   border-radius: 5px;
-  box-shadow: 0 3px 10px rgba(30, 70, 110, 0.05);
+  box-shadow:
+    0 5px 14px rgba(36, 88, 150, 0.08),
+    0 2px 5px rgba(36, 88, 150, 0.04);
   font-size: clamp(11.5px, 0.85vw, 13px);
   line-height: 1.5;
   letter-spacing: 0.04em;
@@ -433,7 +483,9 @@ const ORBIT = [12, 14, 11]
   .work__tag:hover {
     transform: translateY(-2px);
     border-color: rgba(60, 140, 220, 0.25);
-    box-shadow: 0 6px 16px rgba(30, 80, 130, 0.09);
+    box-shadow:
+      0 8px 18px rgba(36, 88, 150, 0.11),
+      0 3px 6px rgba(36, 88, 150, 0.05);
   }
 }
 
@@ -496,7 +548,10 @@ const ORBIT = [12, 14, 11]
   }
 
   .work__orbit,
+  .work__glyph,
   .work__glyph *,
+  .work__icon--team .work__glyph,
+  .work__icon--ai .work__glyph,
   .work__line-sweep {
     animation: none;
   }

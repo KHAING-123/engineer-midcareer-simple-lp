@@ -232,6 +232,16 @@ onBeforeUnmount(() => observer?.disconnect())
   display: block;
   overflow: visible;
   transition: transform 0.7s ease-out;
+  /* 線画全体：ゆっくり少し大きく → 元のサイズへ（背景の淡い図形はカード側なので動かない）
+     ホバーの transform と競合しないよう、scale プロパティで動かす */
+  transform-origin: center;
+  animation: careerIconPulse 2.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.56s); /* 5枚が同時に動かないよう少しずつずらす */
+}
+
+@keyframes careerIconPulse {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.14; }
 }
 
 /* 線：太さ・色はすべて共通 */

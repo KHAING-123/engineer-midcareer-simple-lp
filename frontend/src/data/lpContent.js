@@ -42,9 +42,9 @@ import member02 from '@/assets/images/members/member-02.png'
 import member03 from '@/assets/images/members/member-03.png'
 
 // --- 02 仕事内容 ---
-import workWeb from '@/assets/images/work/work-web.png'
-import workMobile from '@/assets/images/work/work-mobile.png'
-import workAi from '@/assets/images/work/work-ai.png'
+import workWeb from '@/assets/images/work/work-pm-pmo.png'
+import workMobile from '@/assets/images/work/work-ai-dx-support.png'
+import workAi from '@/assets/images/work/work-automation.png'
 
 // --- 03 成長ステップ ---
 import growthMain from '@/assets/images/growth/growth-main.png'
@@ -78,15 +78,16 @@ export const lpContent = {
   // ========================================
   header: {
     logo, // ロゴは上の「ロゴ」で設定
+    // en：日本語の上（PC）／横（SP）に出る小さな英文字
     navigation: [
-      { label: '働く人', href: '#members' },
-      { label: '仕事内容', href: '#work' },
-      { label: '成長のサポート', href: '#growth' },
-      { label: 'キャリア', href: '#career' },
-      { label: '選考・面接', href: '#interview' }
+      { label: '働く人', en: 'MEMBERS', href: '#members' },
+      { label: '仕事内容', en: 'OUR WORK', href: '#work' },
+      { label: '成長のサポート', en: 'GROWTH', href: '#growth' },
+      { label: 'キャリア', en: 'CAREER', href: '#career' },
+      { label: '選考・面接', en: 'INTERVIEW', href: '#interview' }
     ],
     // 右端の小さな見出し（クリックできない文字として表示）
-    cta: { label: 'まずは話を聞いてみる' },
+    cta: { label: 'まずは話を聞いてみる', en: "LET'S TALK" },
     // スマホのメニューボタン（読み上げ用の文言）
     menuOpenLabel: 'メニューを開く',
     menuCloseLabel: 'メニューを閉じる'

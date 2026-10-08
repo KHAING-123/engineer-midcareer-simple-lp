@@ -15,6 +15,7 @@ defineProps({
     <div class="container">
       <SectionHeading
         v-reveal
+        char-reveal
         :number="content.number"
         :english-title="content.englishTitle"
         :title="content.title"

@@ -33,6 +33,7 @@ const orbitStyle = (index) => {
       <div class="growth__intro">
         <SectionHeading
           v-reveal
+          char-reveal
           class="growth__heading"
           :number="content.number"
           :english-title="content.englishTitle"

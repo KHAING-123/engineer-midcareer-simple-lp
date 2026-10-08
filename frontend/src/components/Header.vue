@@ -1,10 +1,18 @@
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import AiNetworkBackground from './common/AiNetworkBackground.vue'
 
-defineProps({
+const props = defineProps({
   content: { type: Object, required: true }
 })
+
+// 「まずは話を聞いてみる」の「話」「聞」だけブルーのグラデーションにするため、文字列を分ける
+const catchParts = computed(() =>
+  props.content.cta.label.split(/([話聞])/).filter(Boolean).map((text) => ({
+    text,
+    accent: text === '話' || text === '聞'
+  }))
+)
 
 const isOpen = ref(false)
 const close = () => { isOpen.value = false }
@@ -30,6 +38,8 @@ onBeforeUnmount(() => {
 
 <template>
   <header class="header" :class="{ 'is-open': isOpen }">
+    <!-- ヘッダー背景のさりげない星座 / AI Network（ロゴ・ナビの後ろは避け、余白だけ。クリックを妨げない） -->
+    <AiNetworkBackground variant="header" />
     <div class="header__inner">
       <a href="#top" class="header__logo" @click="close">
         <img :src="content.logo.image" :alt="content.logo.alt" class="header__logo-image">
@@ -47,11 +57,38 @@ onBeforeUnmount(() => {
             :key="item.href"
             :style="{ '--i': index }"
           >
-            <a :href="item.href" class="header__link" @click="close">{{ item.label }}</a>
+            <a :href="item.href" class="header__link" @click="close">
+              <!-- 小さな英文字：PC は日本語の上、SP は日本語の右（読み上げは日本語だけ） -->
+              <span class="header__link-text">
+                <span v-if="item.en" class="header__link-en" aria-hidden="true">{{ item.en }}</span>
+                <span class="header__link-ja">{{ item.label }}</span>
+              </span>
+            </a>
           </li>
         </ul>
         <!-- 右端の見出し：リンクではない装飾テキスト -->
-        <span class="header__catch">{{ content.cta.label }}</span>
+        <span class="header__cta">
+          <!-- 2つ重なった吹き出し（後ろ：淡い水色＋白い点／手前：ブルーの線＋青い点）。ゆっくり拡大縮小・点が順に点灯 -->
+          <svg class="header__cta-icon" viewBox="0 0 40 34" aria-hidden="true">
+            <g class="hc-bubble hc-bubble--back">
+              <path class="hc-back" d="M16 21 C16 15.5 21 12 27 12 C33 12 38 15.5 38 21 C38 24.6 35.8 27.4 32.6 28.7 L34.5 33 L29 29.7 C28.4 29.8 27.7 29.8 27 29.8 C21 29.8 16 26.3 16 21 Z" />
+              <circle class="hc-dot hc-dot--light" cx="22.5" cy="21" r="1.35" />
+              <circle class="hc-dot hc-dot--light" cx="27" cy="21" r="1.35" />
+              <circle class="hc-dot hc-dot--light" cx="31.5" cy="21" r="1.35" />
+            </g>
+            <g class="hc-bubble hc-bubble--front">
+              <path class="hc-front" d="M2 12 C2 6.5 7.5 2.5 14 2.5 C20.5 2.5 26 6.5 26 12 C26 17.5 20.5 21.5 14 21.5 C12.6 21.5 11.3 21.3 10 21 L4.5 25 L5.6 19.2 C3.3 17.5 2 15 2 12 Z" />
+              <circle class="hc-dot" cx="9.5" cy="12" r="1.45" />
+              <circle class="hc-dot" cx="14" cy="12" r="1.45" />
+              <circle class="hc-dot" cx="18.5" cy="12" r="1.45" />
+            </g>
+          </svg>
+          <span class="header__cta-body">
+            <span v-if="content.cta.en" class="header__link-en header__cta-en" aria-hidden="true">{{ content.cta.en }}</span>
+            <!-- 文字＋下線（下線とそのアニメーションは既存のまま） -->
+            <span class="header__catch"><template v-for="(part, i) in catchParts" :key="i"><span v-if="part.accent" class="header__catch-accent">{{ part.text }}</span><template v-else>{{ part.text }}</template></template></span>
+          </span>
+        </span>
       </nav>
 
       <button
@@ -150,6 +187,36 @@ onBeforeUnmount(() => {
   transform-origin: left;
 }
 
+/* ---------- 小さな英文字（PC：日本語の上） ---------- */
+.header__link-text {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.header__link-en {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 0.18em;
+  color: #8A9AB0;
+  white-space: nowrap;
+}
+
+/* まずは話を聞いてみる：英文字の下に日本語（下線は日本語の部分だけ） */
+.header__cta-body {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.header__cta-en {
+  margin-bottom: -4px; /* 日本語の上の余白（8px）と合わせて 4px 程度の間隔に */
+}
+
 /* まずは話を聞いてみる：テキスト型のCTA（ボタンにはしない）
    ・下にごく薄い線（常時）＋その上を淡いブルーの線が左→右へゆっくり伸びて消える（5.2秒で繰り返し）
    ・PCでマウスを乗せると、文字が2px上がり字間が少し広がり、線が少しはっきりする */
@@ -159,8 +226,9 @@ onBeforeUnmount(() => {
   position: relative;
   display: inline-block;
   padding: 8px 0 10px;
-  color: #14213A;
-  font-size: clamp(14px, 1vw, 15px);
+  color: #102A46;
+  font-family: var(--font-serif); /* 落ち着いた明朝体 */
+  font-size: clamp(14px, 1vw, 16px);
   font-weight: 600;
   letter-spacing: 0.12em;
   line-height: 1.4;
@@ -240,6 +308,86 @@ onBeforeUnmount(() => {
   }
 }
 
+/* 「話」「聞」：上品なブルーのグラデーション（少しだけ大きく） */
+.header__catch-accent {
+  font-size: 1.1em;
+  background: linear-gradient(180deg, #2E7FE0 0%, #6BB1F0 55%, #2F86E6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* アイコン＋文字（下線は文字の部分だけ） */
+.header__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.header__cta-icon {
+  flex-shrink: 0;
+  width: clamp(28px, 2vw, 32px);
+  height: auto;
+  margin-bottom: 2px;
+  overflow: visible;
+}
+
+.header__cta-icon * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.hc-back {
+  fill: #CFE4F8;
+}
+
+.hc-front {
+  fill: #FFFFFF;
+  stroke: #3B8EE8;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.hc-dot {
+  fill: #3B8EE8;
+}
+
+.hc-dot--light {
+  fill: #FFFFFF;
+}
+
+/* A：2つの吹き出しが、少しずつずれてゆっくり拡大・縮小 */
+.hc-bubble {
+  animation: hcBubble 3.6s ease-in-out infinite;
+}
+
+.hc-bubble--back {
+  transform-origin: 70% 60%;
+  animation-delay: -1.8s;
+}
+
+@keyframes hcBubble {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* B：3つの点が左から順に、淡く点灯（会話中のように） */
+.hc-dot {
+  animation: hcDot 1.8s ease-in-out infinite;
+}
+
+.hc-bubble .hc-dot:nth-of-type(2) { animation-delay: 0.25s; }
+.hc-bubble .hc-dot:nth-of-type(3) { animation-delay: 0.5s; }
+.hc-bubble--back .hc-dot { animation-delay: 0.9s; }
+.hc-bubble--back .hc-dot:nth-of-type(2) { animation-delay: 1.15s; }
+.hc-bubble--back .hc-dot:nth-of-type(3) { animation-delay: 1.4s; }
+
+@keyframes hcDot {
+  0%, 60%, 100% { opacity: 0.4; transform: scale(0.85); }
+  30% { opacity: 1; transform: scale(1.1); }
+}
+
 /* リンクにした場合のキーボード操作用（現在はクリックできない文字のため通常は表示されない） */
 .header__catch:focus-visible {
   outline: 1px solid rgba(80, 140, 200, 0.6);
@@ -267,6 +415,24 @@ onBeforeUnmount(() => {
 @media (min-width: 1024px) {
   .header__logo {
     width: 149px;
+  }
+}
+
+/* PC：英文字＋日本語の2段になったナビと「まずは話を聞いてみる」の高さをそろえる（ヘッダーの高さは 60px のまま） */
+@media (min-width: 1024px) {
+  /* リンクの枠を2段全体に（ホバーの下線が日本語の下に出るように） */
+  .header__link {
+    display: inline-block;
+  }
+
+  .header__list {
+    position: relative;
+    top: -4px;
+  }
+
+  .header__cta {
+    position: relative;
+    top: 6px;
   }
 }
 
@@ -347,8 +513,11 @@ onBeforeUnmount(() => {
     display: none;
   }
 
-  .header__catch {
+  .header__cta {
     align-self: flex-start;
+  }
+
+  .header__catch {
     font-size: 14px;
   }
 }
@@ -475,6 +644,26 @@ onBeforeUnmount(() => {
     transition: color 0.25s ease;
   }
 
+  /* 日本語の右に小さな英文字（矢印とは重ならない） */
+  .header__link-text {
+    flex-direction: row;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 10px;
+    min-width: 0;
+  }
+
+  .header__link-ja {
+    order: 1;
+  }
+
+  .header__link-en {
+    order: 2;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    color: #8FA6BF;
+  }
+
   /* 右側の細く小さい「＞」（thin chevron） */
   .header__link::after {
     display: block;
@@ -507,11 +696,36 @@ onBeforeUnmount(() => {
   }
 
   /* ---------- 見出し「まずは話を聞いてみる」（クリック不可） ---------- */
+  .header__cta {
+    position: relative;
+    z-index: 2;
+    align-self: stretch; /* 横幅いっぱい使い、入る幅なら英文字を同じ行に */
+    margin-top: clamp(34px, 8vw, 54px);
+    gap: 10px;
+  }
+
+  .header__cta-icon {
+    width: 26px;
+    margin-bottom: 14px; /* 文字の下の余白（下線ぶん）とそろえて、文字の高さの中央に */
+  }
+
+  /* まずは話を聞いてみる：日本語の右に英文字（狭い画面では下へ回り込む） */
+  .header__cta-body {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 10px;
+    min-width: 0;
+  }
+
+  .header__cta-en {
+    order: 2;
+    margin-bottom: 0;
+  }
+
   .header__catch {
     position: relative;
     z-index: 2;
-    align-self: flex-start;
-    margin-top: clamp(34px, 8vw, 54px);
     padding: 0 0 14px;
     font-size: clamp(15px, 4.2vw, 17px);
     font-weight: 600;
@@ -561,7 +775,9 @@ onBeforeUnmount(() => {
     margin-left: 0 !important;
   }
 
-  .is-open .header__list li {
+  .is-open .header__list li,
+  .hc-bubble,
+  .hc-dot {
     animation: none !important;
   }
 

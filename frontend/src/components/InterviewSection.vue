@@ -16,6 +16,7 @@ defineProps({
       <!-- PC 左上：見出し・説明文 -->
       <SectionHeading
         v-reveal
+        char-reveal
         class="interview__heading"
         :number="content.number"
         :english-title="content.englishTitle"
@@ -269,38 +270,43 @@ defineProps({
   transform: translateX(0);
 }
 
-/* 右下のメッセージカード（画像から少しはみ出す） */
+/* 右下のメッセージ：画像の下端にまたがるように配置（画像の右下に少し重なり、下へ少しはみ出す） */
 .interview__message {
   position: absolute;
   z-index: 2;
   right: clamp(-20px, -1.5vw, -8px);
-  bottom: clamp(24px, 3vw, 50px);
+  bottom: clamp(-52px, -3.4vw, -30px);
 }
 
+/* 白に近いブルーホワイト・細いブルーグレーの線・ごく柔らかい影・明朝体（浮遊アニメーションは既存のまま） */
 .interview__message-inner {
+  position: relative;
   display: block;
-  padding: clamp(18px, 1.8vw, 28px) clamp(20px, 2vw, 32px) clamp(20px, 2vw, 30px);
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(210, 225, 235, 0.35);
-  border-radius: 10px;
-  box-shadow: 0 10px 35px rgba(50, 80, 110, 0.07);
-  font-size: clamp(13px, 1vw, 15px);
-  line-height: 1.9;
-  letter-spacing: 0.06em;
-  color: var(--color-text);
+  padding: clamp(18px, 1.7vw, 26px) clamp(22px, 2vw, 32px) clamp(18px, 1.7vw, 26px) clamp(26px, 2.3vw, 36px);
+  background: #FCFDFF;
+  border: 1px solid rgba(120, 150, 185, 0.22);
+  border-radius: 3px;
+  box-shadow:
+    0 14px 34px rgba(23, 43, 77, 0.08),
+    0 2px 8px rgba(23, 43, 77, 0.04);
+  font-family: var(--font-serif);
+  font-size: clamp(13.5px, 1vw, 15.5px);
+  font-weight: 500;
+  line-height: 1.85;
+  letter-spacing: 0.08em;
+  color: #172B4D;
   animation: interviewFloat 6s ease-in-out infinite;
 }
 
-/* カード下部の短いライトブルーの線 */
-.interview__message-inner::after {
+/* 左側の細い淡いブルーのアクセントライン（1本だけ） */
+.interview__message-inner::before {
   content: '';
-  display: block;
-  width: 40px;
-  height: 2px;
-  margin-top: 12px;
-  background: linear-gradient(90deg, #6EBDF2, #9EDCFF);
+  position: absolute;
+  top: clamp(18px, 1.7vw, 26px);
+  bottom: clamp(18px, 1.7vw, 26px);
+  left: clamp(12px, 1.1vw, 16px);
+  width: 1.5px;
+  background: linear-gradient(180deg, #6EB6EE, rgba(158, 210, 245, 0.35));
 }
 
 @keyframes interviewFloat {
@@ -313,7 +319,8 @@ defineProps({
   width: min(100%, 1040px);
   margin-top: 72px;
   padding: clamp(32px, 3vw, 52px) clamp(26px, 3vw, 52px) clamp(30px, 3vw, 48px);
-  background: rgba(255, 255, 255, 0.94);
+  /* 白ベース → ごく淡いブルー */
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.96) 0%, rgba(251, 253, 255, 0.95) 55%, rgba(243, 249, 255, 0.94) 100%);
   border: 1px solid rgba(40, 65, 95, 0.08);
   border-radius: 4px;
   box-shadow: 0 18px 50px rgba(25, 45, 70, 0.04);
@@ -379,13 +386,83 @@ defineProps({
 
 /* 各項目：白 → ごく淡いブルー → 淡いブルーグレーのやわらかいカード（4枚とも同じ色） */
 .interview__topic {
+  --tp-curve: rgba(205, 230, 252, 0.6);   /* 下の曲線 */
+  --tp-shape: rgba(226, 241, 255, 0.75);  /* 円・多角形 */
+  --tp-dot: rgba(120, 180, 235, 0.35);    /* ドット */
+  --tp-line: rgba(130, 185, 235, 0.22);   /* 斜線 */
+
+  position: relative;
+  isolation: isolate; /* 装飾をカードの中（文字・アイコンの後ろ）に閉じ込める */
   display: flex;
   flex-direction: column;
   padding: clamp(20px, 2vw, 30px) clamp(20px, 2vw, 30px) clamp(22px, 2.2vw, 32px);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 252, 254, 0.94) 35%, rgba(242, 248, 252, 0.88) 68%, rgba(232, 243, 250, 0.78) 100%);
-  border: 1px solid rgba(40, 65, 90, 0.03);
+  /* 上はほぼ白 → 下へ淡いブルー。枠線はごく薄く、影もごく柔らかく（背景になじませる） */
+  background: linear-gradient(155deg, #FFFFFF 0%, #FBFDFF 45%, #F0F8FF 100%);
+  border: 1px solid rgba(150, 190, 225, 0.1);
   border-radius: 4px;
-  box-shadow: 0 14px 36px rgba(28, 55, 82, 0.025);
+  box-shadow: 0 8px 28px rgba(40, 90, 145, 0.035);
+}
+
+/* 背景装飾：カードの枠内だけに描く（はみ出さない・クリックを妨げない） */
+.interview__topic::before,
+.interview__topic::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.interview__topic::before {
+  inset: 0;
+}
+
+/* 1：アイコン左上の小さな円＋右下の曲線 */
+.interview__topic:nth-child(1)::before {
+  background:
+    radial-gradient(circle 22px at 16% 22%, var(--tp-shape) 96%, transparent 100%),
+    radial-gradient(120% 60% at 100% 118%, var(--tp-curve) 0%, rgba(205, 230, 252, 0.25) 55%, transparent 72%);
+}
+
+/* 2：右上の淡い多角形＋ドット、右下の斜めの面 */
+.interview__topic:nth-child(2)::before {
+  background:
+    linear-gradient(135deg, transparent 62%, rgba(205, 230, 252, 0.55) 100%),
+    linear-gradient(200deg, var(--tp-shape) 0%, rgba(226, 241, 255, 0) 45%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.interview__topic:nth-child(2)::after {
+  top: 10px;
+  right: 10px;
+  width: 45px;
+  height: 27px;
+  background-image: radial-gradient(circle, var(--tp-dot) 1px, transparent 1.5px);
+  background-size: 9px 9px;
+}
+
+/* 3：左上のドット＋左下の大きな円＋右下の斜線 */
+.interview__topic:nth-child(3)::before {
+  background:
+    radial-gradient(ellipse 48% 62% at 0% 112%, var(--tp-curve) 0%, rgba(205, 230, 252, 0.35) 70%, transparent 100%),
+    repeating-linear-gradient(135deg, var(--tp-line) 0 1px, transparent 1px 11px) right bottom / 38% 40% no-repeat;
+}
+
+.interview__topic:nth-child(3)::after {
+  top: 18px;
+  left: 18px;
+  width: 54px;
+  height: 45px;
+  background-image: radial-gradient(circle, var(--tp-dot) 1px, transparent 1.5px);
+  background-size: 9px 9px;
+}
+
+/* 4：右上の重なった円＋下のゆるやかな曲線 */
+.interview__topic:nth-child(4)::before {
+  background:
+    radial-gradient(circle 30px at 84% 0%, var(--tp-shape) 96%, transparent 100%),
+    radial-gradient(circle 40px at 100% 8%, rgba(214, 236, 255, 0.5) 96%, transparent 100%),
+    radial-gradient(140% 55% at 60% 125%, var(--tp-curve) 0%, rgba(205, 230, 252, 0.2) 60%, transparent 75%);
 }
 
 /* アイコン＋タイトルを横一列（タイトルはアイコンの縦中央） */
@@ -430,7 +507,7 @@ defineProps({
 
   .interview__message {
     right: 16px;
-    bottom: 20px;
+    bottom: -36px;
   }
 }
 
@@ -468,10 +545,15 @@ defineProps({
     display: none;
   }
 
+  /* SP：画像の下に、右寄せで（画像には重ねない） */
   .interview__message {
     position: static;
     align-self: flex-end;
-    margin: -25px 16px 0 auto;
+    margin: 16px 0 0 auto;
+  }
+
+  .interview__message-inner {
+    font-size: 14px;
   }
 
   .interview__panel {
