@@ -31,9 +31,9 @@ const spread = (x, y) => ({ '--px': `${x}px`, '--py': `${y}px` })
       </g>
       <path class="fi-ink fi-paper" d="M12 8 H26 L34 16 V38 a2 2 0 0 1 -2 2 H14 a2 2 0 0 1 -2 -2 V10 a2 2 0 0 1 2 -2 Z" />
       <path class="fi-ink" d="M26 8 V16 H34" />
-      <path class="fi-ink fi-part" :style="spread(0, -1.5)" d="M17 21 H29" />
-      <path class="fi-ink" d="M17 26 H29" />
-      <path class="fi-ink fi-part" :style="spread(0, 1.5)" d="M17 31 H24" />
+      <path class="fi-ink fi-part fi-text fi-text--1" :style="spread(0, -1.5)" d="M17 21 H29" />
+      <path class="fi-ink fi-text fi-text--2" d="M17 26 H29" />
+      <path class="fi-ink fi-part fi-text fi-text--3" :style="spread(0, 1.5)" d="M17 31 H24" />
     </template>
 
     <!-- 02 カジュアル面談：2つの吹き出し＋3つの点＋小さな青いアクセント -->
@@ -220,13 +220,74 @@ const spread = (x, y) => ({ '--px': `${x}px`, '--py': `${y}px` })
   fill: rgba(22, 119, 232, 0.2);
 }
 
+/* 六角形アイコン（PC・SP 共通）：意味に合わせた動きを少し分かりやすく。
+   transform を使う既存の動きと競合しないよう、追加の拡大縮小・移動は scale / translate プロパティで行う */
 @media (max-width: 767px) {
   .fi {
-    --amp: 0.7;
+    --amp: 1.3;
   }
 }
 
+/* PC：虫めがねの確認の動きを約3秒周期に */
+@media (min-width: 768px) {
+  .fi-scan {
+    animation-duration: 3s;
+  }
+}
+
+/* 01：本文の線が上から順に表示される */
+.fi-text {
+  animation: fiSpread var(--cycle) ease-in-out infinite, fiTextLine 3.2s ease-in-out infinite;
+  animation-delay: var(--delay), 0s;
+}
+
+.fi-text--2 { animation: fiTextLine 3.2s ease-in-out infinite; animation-delay: 0.35s; }
+.fi-text--3 { animation-delay: var(--delay), 0.7s; }
+
+/* 02：吹き出しが会話のように交互に軽く拡大・縮小 */
+.fi--chat .fi-part:nth-of-type(1),
+.fi--chat .fi-part:nth-of-type(2) {
+  animation: fiSpread var(--cycle) ease-in-out infinite, fiPop 2.4s ease-in-out infinite;
+  animation-delay: var(--delay), 0s;
+}
+
+.fi--chat .fi-part:nth-of-type(1) {
+  animation-delay: var(--delay), -1.2s;
+}
+
+/* 03：人物全体がわずかに上下する（落ち着いた動き） */
+.fi--person {
+  animation: fiBob 3.6s ease-in-out infinite;
+}
+
+/* 05：旗の揺れを少しだけ大きく */
+.fi-wave {
+  animation-name: fiWaveSp;
+}
+
+@keyframes fiTextLine {
+  0%, 100% { opacity: 0.25; }
+  25%, 70% { opacity: 1; }
+}
+
+@keyframes fiPop {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.1; }
+}
+
+@keyframes fiBob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -2.5px; }
+}
+
+@keyframes fiWaveSp {
+  0%, 100% { transform: rotate(0deg) skewY(0deg) scaleX(1); }
+  35% { transform: rotate(4deg) skewY(-3deg) scaleX(0.94); }
+  70% { transform: rotate(-2deg) skewY(2deg) scaleX(1.02); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .fi,
   .fi * {
     animation: none !important;
   }

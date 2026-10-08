@@ -48,7 +48,7 @@ const buildRoute = () => {
     return { x: p.x + v.offsetWidth / 2, y: p.y + v.offsetHeight / 2 }
   })
   const circle = list.querySelector('.flow__circle')
-  const r = (circle ? circle.offsetWidth / 2 : 36) + 6 // 円の少し外から線を始める（アイコンに重ねない）
+  const r = (circle ? circle.offsetWidth / 2 : 36) + 8 // 六角形の少し外から線を始める（アイコンに重ねない）
   const f = (n) => n.toFixed(1)
   const parts = []
   const arrows = []
@@ -59,19 +59,20 @@ const buildRoute = () => {
     const sy = a.y + r
     const ey = b.y - r
     parts.push(`M${f(a.x)} ${f(sy)} L${f(b.x)} ${f(ey)}`)
-    // 線の中央に、線の向き（↘ / ↙）にそろえた小さな矢印
-    const angle = (Math.atan2(ey - sy, b.x - a.x) * 180) / Math.PI
-    arrows.push({ x: f((a.x + b.x) / 2), y: f((sy + ey) / 2), angle: angle.toFixed(1) })
+    // 線の途中の小さな丸いポイント
+    arrows.push({ x: f((a.x + b.x) / 2), y: f((sy + ey) / 2) })
+  }
+  // 05 → メモ：六角形の下から斜めに、メモの上辺（左寄り）まで（矢印なし・途中に丸いポイント）
+  const card = body.querySelector('.flow__note-card')
+  const last = centers[centers.length - 1]
+  if (card && last) {
+    const p = offsetIn(card, body)
+    const end = { x: p.x + card.offsetWidth * 0.32, y: p.y - 6 }
+    const sy = last.y + r
+    parts.push(`M${f(last.x)} ${f(sy)} L${f(end.x)} ${f(end.y)}`)
+    arrows.push({ x: f(last.x + (end.x - last.x) * 0.6), y: f(sy + (end.y - sy) * 0.6) })
   }
   routeArrows.value = arrows
-  // 05 → メモ：円の下から下へ、メモの高さで右へ曲がり、メモ左の点まで
-  const link = noteLinkEl.value
-  const last = centers[centers.length - 1]
-  if (link && last) {
-    const p = offsetIn(link, body)
-    const dot = { x: p.x + link.offsetWidth - 4, y: p.y + link.offsetHeight / 2 }
-    parts.push(`M${f(last.x)} ${f(last.y + r)} L${f(last.x)} ${f(dot.y)} L${f(dot.x)} ${f(dot.y)}`)
-  }
   routeD.value = parts.join(' ')
 }
 
@@ -114,14 +115,15 @@ onBeforeUnmount(() => {
         <!-- SPのみ：ジグザグの点線（01 → 05 → メモ）と、その上をゆっくり進む小さな青い点（同じ path） -->
         <svg v-if="routeD" class="flow__route" aria-hidden="true">
           <path :d="routeD" />
-          <g
-            v-for="(arrow, i) in routeArrows"
+          <!-- 線の途中の小さな丸いポイント（矢印は使わない） -->
+          <circle
+            v-for="(pt, i) in routeArrows"
             :key="i"
-            class="flow__route-arrow"
-            :transform="`translate(${arrow.x} ${arrow.y}) rotate(${arrow.angle})`"
-          >
-            <path d="M-6 0 H5 M1 -4 L5 0 L1 4" />
-          </g>
+            class="flow__route-point"
+            :cx="pt.x"
+            :cy="pt.y"
+            r="4.5"
+          />
         </svg>
         <span v-if="routeD" class="flow__route-dot" :style="{ offsetPath: `path('${routeD}')` }" aria-hidden="true" />
 
@@ -155,6 +157,21 @@ onBeforeUnmount(() => {
                 </g>
               </svg>
               <span class="flow__orbit"><span class="flow__orbit-dot" /></span>
+              <!-- SPのみ：六角形の背景（固定）＋外周に沿ってゆっくり進む小さな光点 -->
+              <svg class="flow__hex" viewBox="0 0 100 100">
+                <path class="flow__hex-shape" d="M50 5 L90 28 V72 L50 95 L10 72 V28 Z" />
+                <!-- 外周：ごく淡い六角形の線＋その上を時計回りに進む細い光のライン -->
+                <path class="flow__hex-line" d="M50 -1 L95.5 25 V75 L50 101 L4.5 75 V25 Z" />
+                <path
+                  class="flow__hex-run"
+                  d="M50 -1 L95.5 25 V75 L50 101 L4.5 75 V25 Z"
+                  pathLength="100"
+                  :style="{ animationDelay: `${-index * 1.1}s` }"
+                />
+                <!-- 角の小さなリング（固定） -->
+                <circle class="flow__hex-ring" :cx="index % 2 ? 95.5 : 4.5" cy="25" r="2.6" />
+                <circle class="flow__hex-ring" cx="50" :cy="index % 2 ? 101 : -1" r="2.6" />
+              </svg>
               <span class="flow__circle">
                 <span class="flow__icon">
                   <FlowIcon :type="item.iconType" :index="index" />
@@ -581,6 +598,105 @@ onBeforeUnmount(() => {
   font-size: 1.08em;
 }
 
+/* ---------- 六角形アイコン（PC・SP 共通）：円の見た目を六角形に置き換え。アイコンそのものは同じ ---------- */
+.flow__arcs,
+.flow__orbit {
+  display: none;
+}
+
+.flow__circle,
+.flow__item.is-highlight .flow__circle {
+  position: relative;
+  z-index: 1;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.flow__hex {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.flow__hex-shape {
+  fill: #FFFFFF;
+  stroke: rgba(150, 180, 210, 0.3);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 8px 14px rgba(30, 60, 100, 0.1)) drop-shadow(0 2px 4px rgba(30, 60, 100, 0.05));
+}
+
+/* 外周の光点が通る、ごく淡い六角形の線 */
+.flow__hex-line {
+  fill: none;
+  stroke: rgba(120, 165, 215, 0.18);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* 時計回りに周回する細い光のライン（約5秒で1周） */
+.flow__hex-run {
+  fill: none;
+  stroke: #4A9BE6;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 16 84;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 2px rgba(74, 155, 230, 0.35));
+  animation: flowHexRun 5s linear infinite;
+}
+
+.flow__hex-ring {
+  fill: #FFFFFF;
+  stroke: #4A9BE6;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+.flow__item.is-highlight .flow__hex-shape {
+  stroke: rgba(22, 119, 232, 0.28);
+}
+
+/* PC：ステップ間の点線の両端に小さな丸いポイント（05 → メモは始点のみ。終点はメモ側の点） */
+.flow__connector::before,
+.flow__connector::after {
+  content: '';
+  position: absolute;
+  top: calc(50% - 3.5px);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.4px solid rgba(74, 155, 230, 0.75);
+}
+
+.flow__connector::before {
+  left: -2px;
+}
+
+.flow__connector::after {
+  right: -2px;
+}
+
+.flow__connector.is-last::after {
+  display: none;
+}
+
+/* PC：メモの枠を淡いブルーグレーに */
+@media (min-width: 768px) {
+  .flow__note-card {
+    border-color: rgba(150, 180, 210, 0.3);
+  }
+}
+
 /* ---------- 1200〜1399px：少し小さく ---------- */
 @media (max-width: 1399px) {
   .flow {
@@ -721,6 +837,87 @@ onBeforeUnmount(() => {
     grid-column: 1;
   }
 
+  /* ---------- カード：横長の白いカード（左右交互）。六角形はカードの端に少し重なる ---------- */
+  .flow__list {
+    row-gap: 56px;
+  }
+
+  /* カードの幅は文字量に合わせる（最大 90%）。六角形の位置はこれまでと同じ */
+  .flow__item {
+    width: fit-content;
+    max-width: 90%;
+    grid-template-columns: var(--flow-box) max-content;
+    column-gap: 14px;
+    padding: 12px 24px 12px 0;
+    justify-self: start;
+  }
+
+  .flow__item:nth-child(even) {
+    grid-template-columns: max-content var(--flow-box);
+    justify-content: end;
+    padding: 12px 0 12px 24px;
+    justify-self: end;
+  }
+
+  /* STEP 05：番号と「内定」をカード内で中央に（コンパクトなカード） */
+  .flow__item:nth-child(5) {
+    grid-template-columns: var(--flow-box) minmax(64px, max-content);
+    padding-right: 14px;
+  }
+
+  /* 期間の行がないぶん上に寄るので、「05」「内定」をまとめて少し下げ、カードの上下中央に（間隔はそのまま） */
+  .flow__item:nth-child(5) .flow__number,
+  .flow__item:nth-child(5) .flow__title {
+    justify-self: center;
+    text-align: center;
+    translate: 0 18px;
+  }
+
+  .flow__item::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--flow-box) / 2);
+    right: 0;
+    border-radius: 18px;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.97) 0%, rgba(250, 252, 255, 0.95) 100%);
+    border: 1px solid rgba(150, 180, 210, 0.18);
+    box-shadow:
+      0 14px 34px rgba(30, 60, 100, 0.08),
+      0 3px 10px rgba(30, 60, 100, 0.04);
+    pointer-events: none;
+  }
+
+  .flow__item:nth-child(even)::before {
+    left: 0;
+    right: calc(var(--flow-box) / 2);
+  }
+
+  /* 六角形の後ろの淡いブルーグレーの面 */
+  .flow__visual::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -12px;
+    width: 64%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(200, 214, 232, 0.4);
+    pointer-events: none;
+  }
+
+  .flow__item:nth-child(even) .flow__visual::before {
+    left: auto;
+    right: -12px;
+  }
+
+  /* 05 → メモの接続（点線と点）は SP では表示しない */
+  .flow__note-link {
+    display: none !important;
+  }
+
   /* SPでは各ステップの縦の接続線の代わりに、下のジグザグの線を使う */
   .flow__connector {
     display: none;
@@ -746,11 +943,11 @@ onBeforeUnmount(() => {
     stroke-dasharray: 0 6;
   }
 
-  /* 線の中央の小さな矢印（約11px・細い線・ネイビー。動かさない） */
-  .flow__route .flow__route-arrow path {
-    stroke: var(--flow-arrow);
-    stroke-width: 1.4;
-    stroke-linejoin: round;
+  /* 線の途中の小さな丸いポイント（白地＋細いブルーの輪） */
+  .flow__route .flow__route-point {
+    fill: #FFFFFF;
+    stroke: #4A9BE6;
+    stroke-width: 1.5;
     stroke-dasharray: none;
   }
 
@@ -773,10 +970,10 @@ onBeforeUnmount(() => {
     animation: flowRoute 11s linear infinite;
   }
 
-  /* メモは右下（ステップの列の右端にそろえる）。左の点がジグザグの線の終点 */
+  /* メモは STEP 05 の下（中央より少し右）。ジグザグの線の終点 */
   .flow__note {
-    align-self: flex-end;
-    margin: 48px max(0px, (100% - 420px) / 2) 0 0;
+    align-self: center;
+    margin: 64px 0 0 12%;
   }
 
   .flow__note-link {
@@ -799,6 +996,11 @@ onBeforeUnmount(() => {
   .flow__route-dot {
     display: none;
   }
+}
+
+@keyframes flowHexRun {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -100; }
 }
 
 @keyframes flowRoute {
@@ -828,6 +1030,10 @@ onBeforeUnmount(() => {
   .flow__connector-light,
   .flow__route-dot {
     display: none;
+  }
+
+  .flow__hex-run {
+    animation: none !important;
   }
 
   .flow__orbit {
