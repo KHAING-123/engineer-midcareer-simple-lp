@@ -6,6 +6,9 @@ import InterviewTopicIcon from './InterviewTopicIcon.vue'
 defineProps({
   content: { type: Object, required: true }
 })
+
+// 面接トピックの説明文：改行（\n）で区切って1行＝1項目として表示（空行は無視）
+const toPoints = (text) => (text || '').split('\n').map((s) => s.trim()).filter(Boolean)
 </script>
 
 <template>
@@ -65,8 +68,10 @@ defineProps({
               <InterviewTopicIcon :type="topic.iconType" :index="index" class="interview__icon" />
               <h4 class="interview__topic-title">{{ topic.title }}</h4>
             </div>
-            <!-- 下：説明文（カードの幅いっぱい） -->
-            <p class="interview__topic-description">{{ topic.description }}</p>
+            <!-- 下：説明文（カードの幅いっぱい）。改行ごとに1項目、先頭に小さな青い丸 -->
+            <ul class="interview__topic-description">
+              <li v-for="(point, p) in toPoints(topic.description)" :key="p" class="interview__topic-point">{{ point }}</li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -493,6 +498,28 @@ defineProps({
   font-size: 11.5px;
   color: var(--color-text-light);
   line-height: 1.85;
+  word-break: auto-phrase; /* 文節の区切りで改行（非対応ブラウザは従来どおり） */
+}
+
+/* 説明文の各項目：先頭に小さな青い丸。折り返した2行目以降は文章の開始位置にそろえる */
+.interview__topic-point {
+  position: relative;
+  padding-left: 15px; /* 丸 6px ＋ 間 9px */
+}
+
+.interview__topic-point + .interview__topic-point {
+  margin-top: 12px;
+}
+
+.interview__topic-point::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc(0.925em - 3px); /* 1行目の中央（line-height 1.85 の半分 − 丸の半径） */
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8CC6F2; /* タイトル下ラインと同じ淡いブルー */
 }
 
 /* ---------- 縦並び（1199px以下） ---------- */

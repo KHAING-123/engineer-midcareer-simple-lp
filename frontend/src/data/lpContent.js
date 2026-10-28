@@ -317,22 +317,22 @@ export const lpContent = {
     topics: [
       {
         title: 'あなた自身について',
-        description: '社会人経験者向けに\n『これまでの経験・強み』\nについて話す内容へ。',
+        description: 'これまで経験してきた仕事や、取り組んできたこと\n自分の得意なことや、大切にしている考え方',
         iconType: 'person' // アイコンの種類（InterviewTopicIcon.vue）
       },
       {
         title: 'これまでの経験について',
-        description: '『これまでどんな仕事・\n役割を経験してきたか』など、\n社会人経験を確認する内容へ。',
+        description: 'これまで一緒に働いてきた人たちとの関わり方\nチームで仕事を進めるうえで、大切にしていること',
         iconType: 'briefcase' // アイコンの種類（InterviewTopicIcon.vue）
       },
       {
         title: '仕事への向き合い方について',
-        description: '『今後どんなキャリアを\n築きたいか／IT・AI領域で\n何をやってみたいか』を話す\n内容へ。',
+        description: 'これから挑戦してみたいこと\nIT・AIの分野で興味があることや、将来のキャリアについて',
         iconType: 'growth' // アイコンの種類（InterviewTopicIcon.vue）
       },
       {
         title: '気になること・聞いてみたいこと',
-        description: '仕事内容・働き方・案件・\nキャリアなど、応募者側から\n自由に質問できる内容は残す。',
+        description: '仕事内容や入社後の働き方について\n研修やキャリア、勤務条件など、気になっていることなど、なんでもOK',
         iconType: 'chat' // アイコンの種類（InterviewTopicIcon.vue）
       }
     ]
